@@ -281,18 +281,24 @@
     var sizeOf = function (n) { return CLIP[n] || [1600, 1262]; };
     var phone = matchMedia('(max-width: 760px)'), viewSeen = false;
     var run = function (v) { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); };
+    // Two video layers: the clip on screen keeps playing until the next one can play, then they swap, so a change of state
+    // never shows an empty box while a clip downloads (owner, 12 Nov 2026).
+    var vids = [vid, vid.cloneNode(false)]; vids[1].id = ''; vids[1].hidden = true; vid.after(vids[1]); var front = 0, ticket = 0;
     var show = function (c) {
       cards.forEach(function (x) { x.setAttribute('aria-pressed', String(x === c)); });
       if (c === cur || phone.matches) { cur = c; return; }
       cur = c;
-      frame.classList.add('swap');
-      setTimeout(function () {
-        var n = c.getAttribute('data-img'), name = c.querySelector('b').textContent, wh = sizeOf(n);
-        view.setAttribute('data-kind', c.getAttribute('data-kind'));
-        if (calm) { vid.pause(); vid.hidden = true; img.hidden = false; img.width = wh[0]; img.height = wh[1]; img.src = posterOf(n); img.alt = 'Linea: ' + name; }
-        else { img.hidden = true; vid.hidden = false; vid.width = wh[0]; vid.height = wh[1]; vid.poster = posterOf(n); vid.src = clipOf(n); vid.setAttribute('aria-label', 'Linea: ' + name); if (viewSeen) run(vid); }
-        cap.textContent = name; frame.classList.remove('swap');
-      }, calm ? 0 : 170);
+      var n = c.getAttribute('data-img'), name = c.querySelector('b').textContent, wh = sizeOf(n), kind = c.getAttribute('data-kind');
+      cap.textContent = name;
+      if (calm) { view.setAttribute('data-kind', kind); vids.forEach(function (v) { v.pause(); v.hidden = true; }); img.hidden = false; img.width = wh[0]; img.height = wh[1]; img.src = posterOf(n); img.alt = 'Linea: ' + name; return; }
+      img.hidden = true;
+      var my = ++ticket, back = vids[1 - front], shown = vids[front];
+      back.preload = 'auto'; back.width = wh[0]; back.height = wh[1]; back.poster = posterOf(n); back.setAttribute('aria-label', 'Linea: ' + name);
+      var done = false;
+      var swap = function () { if (done || my !== ticket) return; done = true; view.setAttribute('data-kind', kind); back.hidden = false; shown.hidden = true; shown.pause(); front = 1 - front; if (viewSeen) run(back); };
+      if (shown.hidden || !shown.getAttribute('src')) { back.src = clipOf(n); swap(); return; }
+      back.addEventListener('loadeddata', swap, { once: true }); back.src = clipOf(n); back.load();
+      setTimeout(swap, 900);   // never wait longer than this: show its poster and let it start when it can
     };
     // A clip (or, with reduced motion, its still) in every card, for phones; it loads only when the card comes near.
     cards.forEach(function (c) {
@@ -307,7 +313,11 @@
       var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) show(e.target); }); }, { rootMargin: '-46% 0px -46% 0px' });
       cards.forEach(function (c) { io.observe(c); });
       // The viewer plays only while it is on screen.
-      new IntersectionObserver(function (es) { es.forEach(function (e) { viewSeen = e.isIntersecting; if (calm || phone.matches || vid.hidden) return; if (viewSeen) run(vid); else vid.pause(); }); }, { threshold: 0.2 }).observe(view);
+      var warmed = false;
+      new IntersectionObserver(function (es) { es.forEach(function (e) { viewSeen = e.isIntersecting;
+        // As the section comes near, every state's still is fetched once, so each change shows a picture at once.
+        if (viewSeen && !warmed) { warmed = true; cards.forEach(function (c) { (new Image()).src = posterOf(c.getAttribute('data-img')); }); }
+        if (calm || phone.matches) return; var v = vids[front]; if (v.hidden) return; if (viewSeen) run(v); else v.pause(); }); }, { threshold: 0, rootMargin: '0px 0px 60% 0px' }).observe(view);
       // Phones: a card's clip plays while at least half of it is on screen.
       if (!calm) {
         var vio = new IntersectionObserver(function (es) { es.forEach(function (e) { var v = e.target; if (!phone.matches || !e.isIntersecting) { v.pause(); return; } if (!v.getAttribute('src')) v.src = v.getAttribute('data-src'); run(v); }); }, { threshold: 0.5 });

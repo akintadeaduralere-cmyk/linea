@@ -1,1 +1,0 @@
-import{t as e}from"./sentence-reel-BOjOJzRL.js";var t=document.getElementById(`host`),n=t?.querySelector(`video`),r=new URLSearchParams(location.search).get(`w`);if(t&&r&&(t.style.width=`${Number(r)}px`),new URLSearchParams(location.search).has(`notrack`)&&n?.querySelector(`track`)?.remove(),t&&n){let r=e(t,n);window.reel=r}
