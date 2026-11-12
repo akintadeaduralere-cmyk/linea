@@ -72,8 +72,23 @@ export function mountSentenceReel(host: HTMLElement, media: HTMLMediaElement, op
   pictureGuard.engage();
   // iPhone full screen is the system's own player, which draws captions itself: there the chosen track shows (one, never two).
   const nativeVideo = (findVideo(media) ?? media) as HTMLVideoElement;
-  nativeVideo.addEventListener('webkitbeginfullscreen', () => { pictureGuard.release(); const on = Array.from(nativeVideo.textTracks ?? []).filter((t) => (t.kind === 'captions' || t.kind === 'subtitles') && t.mode === 'showing'); on.slice(0, -1).forEach((t) => { t.mode = 'hidden'; }); }, { signal });
-  nativeVideo.addEventListener('webkitendfullscreen', () => pictureGuard.engage(), { signal });
+  // Linea draws its own captions, so the chosen track is normally kept hidden; the system player draws only a showing one, so
+  // with Captions on the chosen track is switched on for it and hidden again on the way back (captions missing in iPhone full
+  // screen, owner, 12 Nov 2026).
+  let shownForSystem: TextTrack | null = null;
+  nativeVideo.addEventListener('webkitbeginfullscreen', () => {
+    pictureGuard.release();
+    const caps = Array.from(nativeVideo.textTracks ?? []).filter((t) => t.kind === 'captions' || t.kind === 'subtitles');
+    const on = caps.filter((t) => t.mode === 'showing');
+    on.slice(0, -1).forEach((t) => { t.mode = 'hidden'; });
+    const captionsOn = host.querySelector('.sr-words')?.getAttribute('aria-pressed') === 'true';
+    const chosen = on.length === 0 && captionsOn ? caps.find((t) => t.mode === 'hidden') : undefined;
+    if (chosen) { chosen.mode = 'showing'; shownForSystem = chosen; }
+  }, { signal });
+  nativeVideo.addEventListener('webkitendfullscreen', () => {
+    if (shownForSystem) { shownForSystem.mode = 'hidden'; shownForSystem = null; }
+    pictureGuard.engage();
+  }, { signal });
   const status = new StatusRegion(doc, clock);
   // The message is an alert with a Dismiss button (Escape does the same); the text is in its own span so the button survives a change of text.
   const message = el('div', 'sr-message', { role: 'alert' });

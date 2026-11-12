@@ -29,7 +29,7 @@
   var items = document.querySelectorAll('.sc-reveal');
   if (!('IntersectionObserver' in window) || calm) items.forEach(reveal);
   else {
-    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { reveal(e.target); io.unobserve(e.target); } }); }, { threshold: 0.12 });
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { reveal(e.target); io.unobserve(e.target); } }); }, { threshold: 0, rootMargin: '0px 0px 12% 0px' });
     items.forEach(function (e) { io.observe(e); });
   }
 
@@ -59,12 +59,18 @@
   var nav = document.querySelector('.sc-nav');
   var links = Array.prototype.slice.call(document.querySelectorAll('.sc-nav a[href^="#"]:not(.sc-brand)'));
   var onScroll = function () {
-    if (nav) nav.classList.toggle('scrolled', scrollY > 40);
+    if (nav) {
+      nav.classList.toggle('scrolled', scrollY > 40);
+      // Never float over a player: the menu steps aside while any player sits under it, and returns once it has passed.
+      var band = nav.getBoundingClientRect().bottom + 10;
+      var over = Array.prototype.some.call(document.querySelectorAll('.sr-player'), function (pl) { var r = pl.getBoundingClientRect(); return r.width > 0 && r.top < band && r.bottom > 0; });
+      nav.classList.toggle('aside', over);
+    }
     var cur = null;
     links.forEach(function (a) { var s = document.querySelector(a.getAttribute('href')); if (s && s.getBoundingClientRect().top < innerHeight * 0.4) cur = a; });
     links.forEach(function (a) { if (a === cur) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
   };
-  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+  addEventListener('scroll', onScroll, { passive: true }); addEventListener('resize', onScroll); onScroll();
 
   // Cards lean toward the pointer (fine pointers only).
   if (fine && !calm) document.querySelectorAll('.sc-tilt').forEach(function (c) {
@@ -132,6 +138,9 @@
       else { device.style.width = ''; device.style.maxWidth = ''; device.style.zoom = ''; device.inert = false; }
       if (note) note.hidden = !device.inert;
     };
+    var narrow = matchMedia('(max-width: 760px)'), phoneNote = 'You are on a phone, so this shows the phone layout. Open the page on a computer to see the desktop one.', deskNote = note ? note.textContent : '';
+    var fitDesk0 = fitDesk;
+    fitDesk = function () { fitDesk0(); if (note) { note.textContent = narrow.matches ? phoneNote : deskNote; if (narrow.matches) note.hidden = false; } };
     fitDesk(); addEventListener('resize', fitDesk, { passive: true });
     document.querySelectorAll('.as-seg').forEach(function (seg) {
       var opts = Array.prototype.slice.call(seg.querySelectorAll('.as-opt'));
@@ -250,6 +259,14 @@
     if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { es.forEach(function (e) { seen = e.isIntersecting; if (seen) play(); else vid.pause(); }); }, { threshold: 0 }).observe(document.getElementById('hw-stage'));
   })();
 
+  // Any site on a phone: start on Phone and hide the Device choice (restored on a wide screen).
+  (function () {
+    var ph = document.querySelector('.as-opt[data-device="phone"]'), desk = document.querySelector('.as-opt[data-device="desktop"]'); if (!ph || !desk) return;
+    var g = ph.closest('.as-group'), mq = matchMedia('(max-width: 760px)');
+    var apply = function () { if (mq.matches && ph.getAttribute('aria-checked') !== 'true') ph.click(); if (g) g.hidden = mq.matches; };
+    apply(); if (mq.addEventListener) mq.addEventListener('change', apply);
+  })();
+
   // States catalogue: picking a card, or scrolling it into the middle of the screen, shows that state. Playing is a recording.
   (function () {
     var cards = Array.prototype.slice.call(document.querySelectorAll('.ss-card')), view = document.querySelector('.ss-view');
@@ -268,6 +285,12 @@
         cap.textContent = name; frame.classList.remove('swap');
       }, calm ? 0 : 170);
     };
+    var SIZES = { 'phone-play': [600, 1006], 'phone-tray': [600, 1006], 'phone-side': [1400, 654], 'st-phone-side-faded': [1400, 654], 'st-fs-shown': [1600, 1111], 'st-fs-faded': [1600, 1111] };
+    cards.forEach(function (c) {
+      var name = c.getAttribute('data-img'), file = name === 'play-clip' ? 'play-clip-poster' : name, wh = SIZES[name] || [1600, 1262];
+      var pic = document.createElement('img'); pic.className = 'ss-pic'; pic.alt = ''; pic.loading = 'lazy'; pic.decoding = 'async'; pic.width = wh[0]; pic.height = wh[1];
+      pic.src = './showcase/' + file + '.webp'; var body = c.querySelector('.ss-body'); if (body) body.insertBefore(pic, body.firstChild);
+    });
     cards.forEach(function (c) { c.addEventListener('click', function () { show(c); }); });
     cur = cards[0];
     if ('IntersectionObserver' in window) {
