@@ -58,6 +58,7 @@
   // Nav: solid after the top, the current section lit.
   var nav = document.querySelector('.sc-nav');
   var links = Array.prototype.slice.call(document.querySelectorAll('.sc-nav a[href^="#"]:not(.sc-brand)'));
+  var lastY = scrollY;
   var onScroll = function () {
     if (nav) {
       nav.classList.toggle('scrolled', scrollY > 40);
@@ -65,6 +66,8 @@
       var band = nav.getBoundingClientRect().bottom + 10;
       var over = Array.prototype.some.call(document.querySelectorAll('.sr-player'), function (pl) { var r = pl.getBoundingClientRect(); return r.width > 0 && r.top < band && r.bottom > 0; });
       nav.classList.toggle('aside', over);
+      // Out of the way while reading: it slides away as you scroll down and comes back as soon as you scroll up.
+      var y = scrollY; if (y > lastY + 6 && y > 160) nav.classList.add('tucked'); else if (y < lastY - 6) nav.classList.remove('tucked'); if (Math.abs(y - lastY) > 6) lastY = y;
     }
     var cur = null;
     links.forEach(function (a) { var s = document.querySelector(a.getAttribute('href')); if (s && s.getBoundingClientRect().top < innerHeight * 0.4) cur = a; });
