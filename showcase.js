@@ -270,36 +270,51 @@
     apply(); if (mq.addEventListener) mq.addEventListener('change', apply);
   })();
 
-  // States catalogue: picking a card, or scrolling it into the middle of the screen, shows that state. Playing is a recording.
+  // States catalogue: every state is a short recording of the real player doing it (the press is marked). On a computer the
+  // picked card plays in the viewer; on a phone each card plays its own clip while it is on screen. Reduced motion: the stills.
   (function () {
     var cards = Array.prototype.slice.call(document.querySelectorAll('.ss-card')), view = document.querySelector('.ss-view');
     if (!cards.length || !view) return;
     var frame = view.querySelector('.ss-frame'), img = document.getElementById('ss-img'), vid = document.getElementById('ss-vid'), cap = document.getElementById('ss-cap'), cur = null;
+    var CLIP = { 'phone-play': [600,964], 'phone-side': [1400,652], 'phone-tray': [600,992], 'play-clip': [1600,1302], 's0-standby': [1600,1302], 's2-tray': [1600,1304], 's3-language': [1600,1302], 's4-paused': [1600,1302], 'st-captions-off': [1600,1302], 'st-end': [1600,1302], 'st-error': [1600,1302], 'st-focus': [1600,1302], 'st-fs-faded': [1600,1112], 'st-fs-shown': [1600,1112], 'st-loading': [1600,1302], 'st-muted': [1600,1302], 'st-phone-side-faded': [1400,652], 'st-step-wait': [1600,1302], 'st-volume': [1600,1302], 'st-wheel': [1600,1302] };
+    var clipOf = function (n) { return './showcase/stv-' + n + '.mp4'; }, posterOf = function (n) { return './showcase/stv-' + n + '.webp'; };
+    var sizeOf = function (n) { return CLIP[n] || [1600, 1262]; };
+    var phone = matchMedia('(max-width: 760px)'), viewSeen = false;
+    var run = function (v) { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); };
     var show = function (c) {
-      if (c === cur) return; cur = c;
       cards.forEach(function (x) { x.setAttribute('aria-pressed', String(x === c)); });
+      if (c === cur || phone.matches) { cur = c; return; }
+      cur = c;
       frame.classList.add('swap');
       setTimeout(function () {
-        var clip = c.hasAttribute('data-clip'), name = c.querySelector('b').textContent;
+        var n = c.getAttribute('data-img'), name = c.querySelector('b').textContent, wh = sizeOf(n);
         view.setAttribute('data-kind', c.getAttribute('data-kind'));
-        img.hidden = clip; vid.hidden = !clip;
-        if (clip) { vid.poster = './showcase/play-clip-poster.webp'; if (!calm) { var pr = vid.play(); if (pr && pr.catch) pr.catch(function () {}); } }
-        else { vid.pause(); img.src = './showcase/' + c.getAttribute('data-img') + '.webp'; img.alt = 'Linea: ' + name; }
+        if (calm) { vid.pause(); vid.hidden = true; img.hidden = false; img.width = wh[0]; img.height = wh[1]; img.src = posterOf(n); img.alt = 'Linea: ' + name; }
+        else { img.hidden = true; vid.hidden = false; vid.width = wh[0]; vid.height = wh[1]; vid.poster = posterOf(n); vid.src = clipOf(n); vid.setAttribute('aria-label', 'Linea: ' + name); if (viewSeen) run(vid); }
         cap.textContent = name; frame.classList.remove('swap');
       }, calm ? 0 : 170);
     };
-    var SIZES = { 'phone-play': [600, 1006], 'phone-tray': [600, 1006], 'phone-side': [1400, 654], 'st-phone-side-faded': [1400, 654], 'st-fs-shown': [1600, 1111], 'st-fs-faded': [1600, 1111] };
+    // A clip (or, with reduced motion, its still) in every card, for phones; it loads only when the card comes near.
     cards.forEach(function (c) {
-      var name = c.getAttribute('data-img'), file = name === 'play-clip' ? 'play-clip-poster' : name, wh = SIZES[name] || [1600, 1262];
-      var pic = document.createElement('img'); pic.className = 'ss-pic'; pic.alt = ''; pic.loading = 'lazy'; pic.decoding = 'async'; pic.width = wh[0]; pic.height = wh[1];
-      pic.src = './showcase/' + file + '.webp'; var body = c.querySelector('.ss-body'); if (body) body.insertBefore(pic, body.firstChild);
+      var n = c.getAttribute('data-img'), wh = sizeOf(n), el;
+      if (calm) { el = document.createElement('img'); el.alt = ''; el.loading = 'lazy'; el.decoding = 'async'; el.src = posterOf(n); }
+      else { el = document.createElement('video'); el.muted = true; el.defaultMuted = true; el.loop = true; el.playsInline = true; el.setAttribute('muted', ''); el.setAttribute('playsinline', ''); el.preload = 'none'; el.poster = posterOf(n); el.setAttribute('data-src', clipOf(n)); el.setAttribute('aria-hidden', 'true'); }
+      el.className = 'ss-pic'; el.width = wh[0]; el.height = wh[1];
+      var body = c.querySelector('.ss-body'); if (body) body.insertBefore(el, body.firstChild);
     });
     cards.forEach(function (c) { c.addEventListener('click', function () { show(c); }); });
-    cur = cards[0];
     if ('IntersectionObserver' in window) {
       var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) show(e.target); }); }, { rootMargin: '-46% 0px -46% 0px' });
       cards.forEach(function (c) { io.observe(c); });
+      // The viewer plays only while it is on screen.
+      new IntersectionObserver(function (es) { es.forEach(function (e) { viewSeen = e.isIntersecting; if (calm || phone.matches || vid.hidden) return; if (viewSeen) run(vid); else vid.pause(); }); }, { threshold: 0.2 }).observe(view);
+      // Phones: a card's clip plays while at least half of it is on screen.
+      if (!calm) {
+        var vio = new IntersectionObserver(function (es) { es.forEach(function (e) { var v = e.target; if (!phone.matches || !e.isIntersecting) { v.pause(); return; } if (!v.getAttribute('src')) v.src = v.getAttribute('data-src'); run(v); }); }, { threshold: 0.5 });
+        document.querySelectorAll('video.ss-pic').forEach(function (v) { vio.observe(v); });
+      }
     }
+    if (!phone.matches) show(cards[0]); else cur = cards[0];
   })();
 
   // The hero wheel: the player's own wheel drawn large behind it. One notch per spoken line; it turns one notch as each line

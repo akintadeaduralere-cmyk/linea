@@ -262,10 +262,14 @@ export class ReelController {
 
   /** The viewer has asked to play at least once (an error before that is not shown). */
   private playIntent = false;
+  /** The source failed before anyone pressed Play (a page that loads its film early); Play then says so at once. */
+  private failedBeforePlay = false;
 
   private async play(): Promise<void> {
     this.playIntent = true;
     this.playReq.request();
+    // A dead link is reported when Play is pressed (its play() may never settle, which left the player silent).
+    if (this.failedBeforePlay && this.media.readyState < HAVE_CURRENT_DATA) { this.message = MESSAGES.mediaError; this.emit(); }
     try { await this.media.play(); } catch { this.message = MESSAGES.playFailed; this.playReq.cancel(); }
     if (!this.destroyed) this.emit();
   }
@@ -275,7 +279,7 @@ export class ReelController {
       onMedia: (type) => this.onMediaEvent(type),
       // A failed caption request can raise a media error although the film plays: only show one if nothing can play.
       // Nothing is said about a broken source until the viewer asks to play (a page that loads with a dead source stays quiet, the same in every engine).
-      onError: () => { if (this.playIntent && this.media.readyState < HAVE_CURRENT_DATA) { this.message = MESSAGES.mediaError; this.emit(); } },
+      onError: () => { if (this.media.readyState >= HAVE_CURRENT_DATA) return; if (!this.playIntent) { this.failedBeforePlay = true; return; } this.message = MESSAGES.mediaError; this.emit(); },
       onFullscreen: (nativePlayer) => { if (nativePlayer !== undefined) this.nativeFs = nativePlayer; this.emit(); },
     });
   }
@@ -287,6 +291,7 @@ export class ReelController {
 
   /** Playback works: a media error or a failed play shown earlier no longer applies. */
   private recover(): void {
+    if (this.media.readyState >= HAVE_CURRENT_DATA) this.failedBeforePlay = false;
     if (this.media.readyState >= HAVE_CURRENT_DATA && (this.message === MESSAGES.mediaError || this.message === MESSAGES.playFailed || this.message === MESSAGES.playSlow)) this.message = '';
   }
 
