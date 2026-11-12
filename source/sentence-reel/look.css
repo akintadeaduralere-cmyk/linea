@@ -1,0 +1,340 @@
+/*
+ * The look: the approved Sentence Reel (08-render/out/sentence-reel-front.jpg and -phone.jpg) built from the artist's
+ * layers. Positions are in look-layout.css (generated from anchors.json); this file holds everything that is the same
+ * in both layouts. Loaded after reel.css and written to win over it by one class (.sr-look), so reel.css stays the
+ * plain, tested fallback. In forced-colors none of this applies: the plain layout is used.
+ *
+ * Two kinds of text, two rules:
+ *   FUNCTIONAL text (the six key names, the time digits, the sentence line) is never under 12 CSS px.
+ *   ENGRAVED micro-print (TIME, NOW, SEEK, LEVEL, the word in the hub, the notch numbers, the three lines on the disc)
+ *   is decoration at the approved proportions from anchors.json. It is aria-hidden (pseudo-elements carry empty alt text),
+ *   and every control keeps its real accessible name.
+ *
+ * Typeface (final, the owner's choice): Saira Bold 700 for names, labels and time; Saira SemiBold 600 (lower case) for the sentence window, as display glass (owner decision, 12 Nov 2026).
+ * One token each: --sr-font-names with its capital ratio --sr-cap-names, and --sr-font-window for the sentence window (Saira SemiBold 600, lower case).
+ */
+@property --hn { syntax: '<number>'; inherits: true; initial-value: 6; }
+@property --cap { syntax: '<number>'; inherits: true; initial-value: 3; }
+@property --k { syntax: '<number>'; inherits: true; initial-value: 1; }
+@font-face { font-family: 'SR Names'; src: url(./fonts/saira-bold.woff2) format('woff2'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'SR Window'; src: url(./fonts/saira-semibold.woff2) format('woff2'); font-weight: 600; font-display: swap; }
+@font-face { font-family: 'SR Window'; src: url(./fonts/saira-bold.woff2) format('woff2'); font-weight: 700; font-display: swap; }
+
+@media (forced-colors: active) { .sr-art, .sr-spacer { display: none; } }
+
+@media not (forced-colors: active) {
+  .sr-look {
+    --sr-font-names: 'SR Names', 'Arial Narrow', system-ui, sans-serif;
+    --sr-cap-names: 0.688;
+    --sr-font-window: 'SR Window', 'SR Names', system-ui, sans-serif;
+    --sr-ink: #0b0c0f;
+    /* Floors: functional text 12 px, hit areas 48 px. Under the 320 px reflow reference both go to 0 and the whole player scales as one unit (see the 281 px block). */
+    --fl: 12px; --hit: 48px;
+    /* Sentence window, display glass (owner decision 12 Nov 2026): said words near white, the spoken word ember, coming words dim grey at 5.3:1 on the black glass #050607. */
+    --sr-w-said: var(--l-done); --sr-w-spoken: var(--l-now); --sr-w-spoken-glow: var(--ember-glow); --sr-w-coming: var(--l-next); --sr-w-glass: var(--g-display);
+    /* Engraved names: dark graphite (sampled 48,49,54 on the aluminium), not black. */
+    --sr-engrave: #303136;
+    --sr-white: #f6f6f2;
+    --sr-soft: #a9adb6;
+    --sr-ease: cubic-bezier(0.16, 1, 0.3, 1);
+    /* The shadow reaches past the player; this padding (6 percent of the page width) keeps it inside the component's own box. */
+    position: relative; isolation: isolate; overflow-x: clip; padding: 6%; background: none; color: var(--sr-ink);
+    font-family: var(--sr-font-names); font-weight: 700; -webkit-font-smoothing: antialiased;
+  }
+  .sr-look.sr-player:is(:fullscreen,[data-theatre]) { display: block; padding: 0; background: linear-gradient(#dcdde1, #8e9198); container-type: size; }
+  .sr-look :is(video-player, media-container) { display: contents; }
+  .sr-look :is(.sr-controls, .sr-reelwrap, .sr-keys, .sr-timeline) { display: contents; }
+  .sr-spacer { display: block; }
+  .sr-look.sr-player:is(:fullscreen,[data-theatre]) .sr-spacer { display: none; }
+  .sr-art { position: absolute; inset: 0; pointer-events: none; }
+  .sr-art > *, .sr-look .sr-stage, .sr-look .sr-window, .sr-look .sr-time, .sr-look .sr-fader, .sr-look .sr-reel,
+  .sr-look .sr-hub, .sr-look .sr-btn, .sr-look .sr-volume { position: absolute; margin: 0; box-sizing: border-box; }
+
+  /* Order of the layers, back to front. Live parts sit above the glass; the reel sits under it. */
+  .sr-a-shadow { z-index: 0; } .sr-a-body { z-index: 1; }
+  .sr-a-platter { z-index: 4; } .sr-look .sr-reel { z-index: 5; } .sr-a-light { z-index: 6; mix-blend-mode: screen; }
+  .sr-a-arm { z-index: 7; } .sr-a-hub, .sr-a-hubgrain { z-index: 8; } .sr-look .sr-hub { z-index: 9; }
+  /* The film lies over the reel where they overlap (the reel is under the glass), and the glass frame is over the film. */
+  .sr-look .sr-stage { z-index: 9; } .sr-a-corners { z-index: 9; } .sr-a-glass { z-index: 10; }
+  .sr-look :is(.sr-window, .sr-time, .sr-fader, .sr-btn, .sr-volume, .sr-a-now) { z-index: 11; }
+  .sr-look .sr-message { position: absolute; z-index: 12; left: calc(var(--ox) + var(--u) * 14); top: calc(var(--oy) + var(--u) * 14); max-width: calc(var(--u) * 396); border-radius: 6px; }
+
+  .sr-a-body::after { content: ''; position: absolute; inset: 0; background: url(./assets/desktop/grain@1x.webp) 0 0 / calc(var(--u) * 60.5) calc(var(--u) * 60.5); mix-blend-mode: soft-light; opacity: 0.55; }
+  .sr-look .sr-stage { overflow: hidden; background: #000; aspect-ratio: auto; min-height: 0; }
+  /* Viewfinder corners over the film, 10 mm arms in from the glass corners. */
+  .sr-a-corners {
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 416 234' preserveAspectRatio='none' fill='none' stroke='%23f6f6f2' stroke-width='0.7'%3E%3Cpath d='M10 20V10h10M396 10h10v10M406 214v10h-10M20 224H10v-10'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
+  }
+
+  /* Functional names: the six key names. Capital height from the artist's anchors over the face's capital ratio, never under 12 px. */
+  .sr-look .sr-btn::after {
+    font-family: var(--sr-font-names); font-weight: 700; text-transform: uppercase; letter-spacing: 0.069em; white-space: nowrap; line-height: 1; color: var(--sr-engrave);
+    font-size: max(var(--fl), calc(var(--u) * var(--nm, 4.09) / var(--sr-cap-names)));
+  }
+  /* Engraved micro-print: approved proportions, no floor, aria-hidden. */
+  .sr-look .sr-volume::after, .sr-look .sr-fader::before, .sr-a-now, .sr-look .sr-hub::after, .sr-look .sr-time::before {
+    font-family: var(--sr-font-names); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; line-height: 1; color: var(--sr-engrave);
+    font-size: calc(var(--u) * var(--nm, 2.42) / var(--sr-cap-names));
+  }
+  .sr-a-now { --nm: 2.42; translate: -50% -50%; letter-spacing: 0.152em; }
+
+  /* Keys: the button is the frame of the rendered cap; its real text stays for assistive technology and is not drawn. */
+  .sr-look .sr-btn {
+    --B: max(var(--hit), var(--F, 64px)); padding: 0; min-width: 0; min-height: 0; border: 0; border-radius: 50%;
+    background: transparent no-repeat; color: transparent; font-size: 0; line-height: 0; cursor: pointer; overflow: visible;
+    padding-inline: calc((var(--B) - var(--F)) / 2);
+    background-image: var(--glyph), var(--im-caps);
+    background-size: var(--g) var(--g), calc(var(--F) * 2) var(--F);
+    background-origin: border-box, content-box; background-clip: border-box, content-box;
+    background-position: center, left 0 center;
+  }
+  .sr-look .sr-btn:active { background-position: center, left calc(var(--F) * -1) center; }
+  @media (hover: hover) { .sr-look .sr-btn:hover, .sr-look .sr-hub:hover { filter: brightness(1.14); } }
+  .sr-look .sr-btn[aria-disabled="true"] { opacity: 0.5; filter: grayscale(0.85) brightness(0.92); cursor: default; }
+  .sr-look .sr-reel[aria-disabled="true"] .sr-notches { opacity: 0.62; }
+  .sr-look .sr-btn[aria-pressed], .sr-look .sr-btn[aria-checked] { background-color: transparent; }
+  .sr-look .sr-btn::after {
+    content: attr(data-label); content: attr(data-label) / ''; position: absolute; left: calc(50% + var(--nx, 0px)); top: calc(50% + var(--ny, 0px)); translate: var(--nt, -50%) -50%; right: auto; bottom: auto; height: auto; width: auto;
+  }
+  /* Lamps: filled ember is on, a hollow ring on black is off. */
+  .sr-look .sr-btn::before {
+    content: none; position: absolute; left: calc(50% + var(--lx)); top: calc(50% + var(--ly)); width: var(--ls); height: var(--ls); translate: -50% -50%;
+    background: var(--im-lamps) 100% 0 / 200% 100% no-repeat; pointer-events: none;
+  }
+  .sr-look :is(.sr-words, .sr-wait, .sr-full, .sr-sound)::before { content: ''; }
+  .sr-look .sr-btn[aria-pressed="true"]::before, .sr-look .sr-btn[aria-checked="true"]::before { background-position: 0 0; }
+  .sr-look .sr-wait { --glyph: none; background-image: var(--im-knob); background-size: calc(var(--F) * 2) var(--F); background-origin: content-box; background-clip: content-box; background-position: left 0 center; }
+  .sr-look .sr-wait[aria-checked="true"], .sr-look .sr-wait:active { background-position: left calc(var(--F) * -1) center; }
+
+  /* Icons: the artist's exact marks (assets/glyphs/*.svg, generated into look-layout.css as --glyph), each placed at its cap's box; --g is the cap diameter. */
+
+  /* Hub: base and cap are rendered; the glyph is live; the word is engraved micro-print; the ember ring is the one hot colour. */
+  .sr-look .sr-hub {
+    --B: max(var(--hit), var(--F)); padding: 0; min-width: 0; min-height: 0; border: 0; border-radius: 50%; color: transparent; font-size: 0; cursor: pointer;
+    background: transparent no-repeat; background-image: var(--hub-glyph), var(--im-hubcap);
+    background-size: var(--g) var(--g), calc(var(--F) * 2) var(--F);
+    background-position: center calc(50% - var(--u) * var(--hgy)), left calc((var(--B) - var(--F)) / 2) center;
+  }
+  .sr-look .sr-hub[data-paused="true"] { --hub-glyph: var(--hub-glyph-play); }
+  .sr-look .sr-hub:active { background-position: center calc(50% - var(--u) * var(--hgy)), left calc((var(--B) - var(--F)) / 2 - var(--F)) center; }
+  .sr-look .sr-hub::after { content: attr(data-label); content: attr(data-label) / ''; position: absolute; left: 50%; translate: -50% -50%; color: var(--sr-white); letter-spacing: 0.0928em; --nm: var(--lab); }
+  .sr-look .sr-hub::before { content: ''; position: absolute; left: 50%; top: 50%; translate: -50% -50%; border: solid var(--ember); border-radius: 50%; box-shadow: inset 0 0 calc(var(--u) * 2.2) var(--ember-hot), 0 0 calc(var(--u) * 3) var(--ember-glow); pointer-events: none; box-sizing: border-box; }
+  .sr-look .sr-hub[aria-busy="true"]::before { border-style: dashed; animation: sr-turn 1.4s linear infinite; }
+  @keyframes sr-turn { to { rotate: 360deg; } }
+
+  /* Reel: the slider is the whole disc. Notches are drawn from the sentence count, the ring turns to the current one. */
+  .sr-look .sr-reel { border: 0; border-radius: 50%; padding: 0; background: none; display: block; min-width: 0; min-height: 0; cursor: grab; touch-action: none; }
+  .sr-look .sr-reel[aria-disabled="true"] { border: 0; cursor: default; }
+  .sr-look .sr-fine { display: none; }
+  .sr-look .sr-notches {
+    position: absolute; inset: 0; display: block; height: auto; padding: 0;
+    transform: rotate(calc(var(--sr-now, 0) * -360deg / var(--n, 16))); transition: transform 320ms var(--sr-ease);
+  }
+  .sr-look .sr-notches[data-numbered] { position: absolute; padding: 0; }
+  .sr-look .sr-notches[data-numbered] .sr-notch, .sr-look .sr-notch { position: absolute; inset: 0; flex: none; height: auto; min-width: 0; background: none; border-radius: 0; }
+  .sr-look .sr-notch { --a: calc(-90deg + var(--i, 0) * 360deg / var(--n, 16)); --h: calc(180deg / var(--n, 16) - var(--gap)); --fill: var(--ahead); }
+  /* The artist's rendered segment (d-notch / p-notch: three frames, current, played, unplayed), lit correctly at the NOW position only (the left, conic 270 degrees).
+     Each notch is that sprite turned to its place and stretched to its chord; the light from the lower right (the ember panel) is one static overlay on the ring (no per-notch work while it turns). */
+  /* Matte, as approved: the sprite is dimmed to the approved mean (played grey about 148, unplayed about 26 on the render), a fixed value per state, never animated. */
+  .sr-look .sr-notch { --state: 100%; --nb: var(--nb-ahead, 0.75); }
+  .sr-look .sr-notch[data-played] { --state: 50%; --nb: var(--nb-played, 0.85); }
+  .sr-look .sr-notch[data-current] { --state: 0%; --nb: 1; }
+  /* The face is sliced: both ends (the bevelled corners, --nf-cap mm of the sprite) are drawn at their true size; only the flat middle stretches to the chord of this
+     sentence count, so the bevel never distorts at any count. At sixteen the three pieces meet at scale 1, exactly the artist's picture. */
+  .sr-look .sr-reel {
+    --hn: calc(2 * var(--band-mid) * sin(180deg / var(--n, 16) - var(--gap)) * var(--nf-hmm) / var(--nf-chord));
+    --cap: min(var(--nf-cap, 3), calc(var(--hn) / 2 - 0.2));
+    --k: calc((var(--hn) - 2 * var(--cap)) / (var(--nf-hmm) - 2 * var(--cap)));
+  }
+  .sr-look .sr-notch-face {
+    position: absolute; left: calc(50% + var(--u) * var(--band-mid) * sin(var(--a))); top: calc(50% - var(--u) * var(--band-mid) * cos(var(--a)));
+    width: var(--nf-w); height: calc(var(--u) * var(--hn)); box-sizing: border-box; padding-block: calc(var(--u) * var(--cap));
+    transform: translate(-50%, -50%) rotate(calc(var(--a) - 270deg)); pointer-events: none;
+    background: var(--im-notch) var(--state) calc(var(--u) * var(--cap) * var(--k) * -1) / 300% calc(var(--nf-h) * var(--k)) no-repeat;
+    background-origin: content-box; background-clip: content-box; filter: brightness(var(--nb));
+  }
+  /* The drawn ring (any count but 16): the current notch, under the index arm, is lit ember and stands out a little past the arm on both sides, so it is seen at every count (at 40 notches the arm is as wide as the notch). */
+  .sr-look .sr-reel:not([data-ring16]) .sr-notch[data-current] .sr-notch-face { scale: 1 1.45; filter: brightness(var(--nb)) drop-shadow(0 0 calc(var(--u) * 1.2) var(--ember)); }
+  .sr-look .sr-notch-face::before, .sr-look .sr-notch-face::after {
+    content: ''; position: absolute; left: 0; right: 0; height: calc(var(--u) * var(--cap) + 0.75px);
+    background: var(--im-notch) var(--state) 0 / 300% var(--nf-h) no-repeat;
+  }
+  .sr-look .sr-notch-face::before { top: 0; }
+  .sr-look .sr-notch-face::after { bottom: 0; background-position: var(--state) 100%; }
+  /* At rest with nothing known the ring shows its neutral form: sixteen dark segments, no numbers, no current notch. */
+  .sr-look .sr-notches[data-empty] {
+    background: repeating-conic-gradient(from calc(-90deg - 11.25deg + var(--gap)), #2c2e33 0, #2c2e33 calc(22.5deg - var(--gap) * 2), transparent calc(22.5deg - var(--gap) * 2), transparent 22.5deg);
+    -webkit-mask-image: radial-gradient(circle at center, transparent calc(var(--u) * var(--band-in)), #000 calc(var(--u) * var(--band-in) + 0.5px), #000 calc(var(--u) * var(--band-out) - 0.5px), transparent calc(var(--u) * var(--band-out)));
+    mask-image: radial-gradient(circle at center, transparent calc(var(--u) * var(--band-in)), #000 calc(var(--u) * var(--band-in) + 0.5px), #000 calc(var(--u) * var(--band-out) - 0.5px), transparent calc(var(--u) * var(--band-out)));
+  }
+  /* Notch numbers: engraved on the disc at the approved radius and size, upright. Up to 20 notches all carry one; above that, every fifth. */
+  .sr-look .sr-notch::after { content: none; }
+  .sr-look .sr-notches[data-numbered] .sr-notch::after, .sr-look .sr-notches[data-fifth] .sr-notch[data-fifth]::after {
+    content: attr(data-number); content: attr(data-number) / ''; position: absolute; inset: auto; font-family: var(--sr-font-names); font-weight: 700; line-height: 1; letter-spacing: 0.04em;
+    font-size: calc(var(--u) * var(--num-cap) / var(--sr-cap-names)); color: #8a909c; font-variant-numeric: tabular-nums;
+    left: calc(50% + var(--u) * var(--num-r) * sin(var(--a))); top: calc(50% - var(--u) * var(--num-r) * cos(var(--a)));
+    transform: translate(-50%, -50%) rotate(calc(var(--sr-now, 0) * 360deg / var(--n, 16))); transition: transform 320ms var(--sr-ease); will-change: transform;
+  }
+  /* The free edge of the disc: a fine ring of round beads (count and size from the artist's anchors). The dark ring is static (::before). The pearls are a mask on .sr-beads,
+     which turns with the ring; the colour inside is the artist's by-angle sample (conic, from anchors.json) turned back by the same angle, so the light side stays lower right.
+     Both turn on transform with one duration, so they cancel at every frame. */
+  .sr-look .sr-reel::before { content: ''; position: absolute; inset: 0; border-radius: 50%; pointer-events: none; background: var(--bead-base) center / 100% 100% no-repeat; }
+  .sr-look .sr-reel::after {
+    content: ''; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+    background: linear-gradient(135deg, rgb(255 255 255 / 0.05) 0%, transparent 40%, rgb(0 0 0 / 0.16) 100%);
+    -webkit-mask-image: radial-gradient(circle at center, transparent calc(var(--u) * var(--band-in)), #000 calc(var(--u) * var(--band-in) + 0.5px), #000 calc(var(--u) * var(--band-out) - 0.5px), transparent calc(var(--u) * var(--band-out)));
+    mask-image: radial-gradient(circle at center, transparent calc(var(--u) * var(--band-in)), #000 calc(var(--u) * var(--band-in) + 0.5px), #000 calc(var(--u) * var(--band-out) - 0.5px), transparent calc(var(--u) * var(--band-out)));
+  }
+  .sr-look .sr-beads, .sr-look .sr-beads-light { position: absolute; inset: 0; border-radius: 50%; pointer-events: none; display: block; transition: transform 320ms var(--sr-ease); }
+  .sr-look .sr-beads { -webkit-mask: var(--bead) center / 100% 100% no-repeat; mask: var(--bead) center / 100% 100% no-repeat; transform: rotate(calc(var(--sr-now, 0) * -360deg / var(--n, 16))); }
+  .sr-look .sr-beads-light { background: conic-gradient(from 0deg, var(--bead-colours)); transform: rotate(calc(var(--sr-now, 0) * 360deg / var(--n, 16))); }
+  /* The baked ring (a 16-sentence film): static pictures in screen space, never turning. The played ring shows through a conic mask over the said slots (22.5 degree slots, the current one at nine o'clock),
+     the unplayed ring is the base, the current notch sits on top. Only the mask changes, and it changes as a four-frame wipe while the disc is moving fastest. For any other count the drawn ring below stays. */
+  @property --rm-now { syntax: '<number>'; inherits: true; initial-value: 0; }
+  .sr-look .sr-ring { display: none; position: absolute; inset: 0; pointer-events: none; }
+  .sr-look .sr-reel[data-ring16] .sr-ring { display: block; }
+  .sr-look .sr-ring > i { position: absolute; display: block; pointer-events: none; }
+  .sr-look .sr-reel[data-ring16] .sr-ring-played {
+    --rm-now: var(--sr-now, 0); transition: --rm-now 120ms linear;
+    -webkit-mask-image: conic-gradient(from calc(258.75deg - var(--rm-now) * 22.5deg), #000 0deg, #000 calc(var(--rm-now) * 22.5deg), transparent calc(var(--rm-now) * 22.5deg));
+    mask-image: conic-gradient(from calc(258.75deg - var(--rm-now) * 22.5deg), #000 0deg, #000 calc(var(--rm-now) * 22.5deg), transparent calc(var(--rm-now) * 22.5deg));
+  }
+  .sr-look .sr-reel[data-ring16] :is(.sr-notch-face, .sr-beads) { display: none; }
+  .sr-look .sr-reel[data-ring16]::before, .sr-look .sr-reel[data-ring16]::after { display: none; }
+  /* The print on the disc: three live lines on arcs, as engraved in the approved render. Decoration, aria-hidden. */
+  .sr-disc { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+  .sr-disc text { fill: #7d828d; font-family: var(--sr-font-names); font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; }
+  .sr-disc .sr-disc-name { fill: #eef1f6; letter-spacing: 0.2em; }
+  .sr-disc .sr-disc-generic { fill: #6a6f79; letter-spacing: 0.16em; }
+
+  /* Reel focus: the ring on the disc is partly under the glass, so the hub carries one too while the reel has focus. */
+  .sr-look:has(.sr-reel:focus-visible) .sr-a-hub { border-radius: 50%; outline: 3px solid #fff; outline-offset: -2px; box-shadow: 0 0 0 3px var(--sr-ink); }
+
+  /* Sentence window, display glass: real text in Saira SemiBold 600, sentence case (the text in the page keeps its own case), on black glass with a faint uniform dot grid (about 5 percent,
+     no mask over the text). Said words near white, coming words dim, the spoken word ember with a soft same-hue glow and ONE ember underline under it (.sr-ul), which moves word to word by transform only.
+     Long sentences wrap at this one size; past what the face holds (at most three lines) the window stays one page tall and turns pages by the spoken word, so it never grows into the keys. */
+  .sr-look .sr-window {
+    --lh: calc(1.15em + 2px); --p: max(1.6px, calc(var(--pitch) * 0.5));
+    display: flex; align-items: center; overflow: visible; padding: 0; max-height: none; line-height: var(--lh);
+    background-color: var(--sr-w-glass); background-clip: padding-box;
+    background-image: radial-gradient(circle, rgb(255 255 255 / 0.05) 0.55px, transparent 0.75px), linear-gradient(180deg, rgb(255 255 255 / 0.03), rgb(255 255 255 / 0) 45%);
+    background-size: var(--p) var(--p), 100% 100%;
+    border: solid var(--plate, #4a4b4e); border-width: var(--bz-y, 0px) var(--bz-x, 0px); border-radius: calc(var(--u) * 5);
+    box-shadow: 0 calc(var(--u) * 0.5) calc(var(--u) * 1.1) rgb(0 0 0 / 0.32), inset 0 calc(var(--u) * 0.45) calc(var(--u) * 1.2) rgb(0 0 0 / 0.65);
+    font-size: max(var(--fl), calc(var(--pitch) * 8));
+    font-family: var(--sr-font-window); font-weight: 600; letter-spacing: 0.01em; color: var(--sr-w-coming);
+  }
+  /* Paged: one page tall (the face's own height), the text starts after the slack so no sliver of the next line shows under the last one. */
+  .sr-look .sr-window[data-paged] { align-items: flex-start; padding-top: max(0px, calc(var(--sr-slack, 0px) - 2px)); max-height: calc(var(--sr-face, 0px) + 2 * var(--bz-y, 0px)); overflow: hidden; }
+  /* The full screen caption strip: the same window (face, colours, word lighting) at a size set by the screen, centred low on the picture. Shown by the rule in reel.css. */
+  .sr-look .sr-window.sr-strip { display: none; }
+  .sr-look.sr-player[data-idle][data-strip] .sr-window.sr-strip:not([data-quiet]) {
+    display: flex; position: absolute; left: 0; right: 0; margin-inline: auto; transform: none; top: auto; bottom: 7%; width: min(88%, 1400px); min-height: 0; z-index: 11; pointer-events: none;
+    --pitch: max(2.2px, 0.26cqw); --bz-x: max(2px, 0.2cqw); --bz-y: max(2px, 0.16cqw);
+  }
+  .sr-look .sr-window[data-quiet] .sr-sentence { opacity: 0.55; }
+  .sr-look .sr-sentence {
+    position: relative; margin: 0; width: 100%; height: auto; overflow: visible; padding-inline: 0.9em 0.6em; white-space: normal; overflow-wrap: anywhere;
+    line-height: var(--lh); transform: translateY(calc(var(--sr-page, 0) * var(--lh) * var(--sr-page-lines, 3) * -1));
+  }
+  .sr-look .sr-word { color: var(--sr-w-coming); }
+  .sr-look .sr-word[data-said] { color: var(--sr-w-said); }
+  .sr-look .sr-word[data-spoken] { color: var(--sr-w-spoken); text-decoration: none; text-shadow: 0 0 0.5em var(--sr-w-spoken-glow); }
+  /* The one underline: its left, row and width come from the measured word box (--ul-x, --ul-y, --ul-w), applied by transform only. */
+  .sr-look .sr-ul {
+    display: block; position: absolute; left: 0; top: 0; width: 1px; height: 2px; margin-top: -3px; border-radius: 1px; background: var(--sr-w-spoken); pointer-events: none;
+    transform: translate(var(--ul-x, 0px), var(--ul-y, 0px)) scaleX(var(--ul-w, 0)); transform-origin: 0 0;
+    transition: transform 250ms var(--sr-ease), opacity 120ms linear;
+  }
+  .sr-look .sr-ul[data-off] { opacity: 0; }
+  .sr-look .sr-ul[data-jump] { transition-duration: 0s; }
+
+  /* Time window: current time first, tabular figures. The digits are functional (12 px at least); the word TIME is engraved. */
+  .sr-look .sr-time {
+    display: flex; align-items: center; padding: var(--tdy) 0 0 var(--tx); background: var(--plate, #464749); border-radius: calc(var(--u) * 5); box-shadow: 0 calc(var(--u) * 0.5) calc(var(--u) * 1.1) rgb(0 0 0 / 0.32); color: #ffffff; white-space: nowrap;
+    font-family: var(--sr-font-names); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: 0; overflow: hidden; -webkit-text-stroke: 0.35px currentColor;
+    font-size: max(var(--fl), calc(var(--u) * var(--tcap) / var(--sr-cap-names)));
+  }
+  .sr-look .sr-time > span[aria-hidden] { white-space: pre; padding: 0; }
+  .sr-look .sr-time::before {
+    content: 'Time'; content: 'Time' / ''; position: absolute; left: var(--tx); top: calc(50% - var(--tly)); translate: 0 -50%; --nm: var(--tlabel); color: var(--sr-soft); letter-spacing: 0.152em;
+  }
+
+  /* Timeline: one capsule per sentence, a rendered rider, a quarter tick under four of them. */
+  .sr-look .sr-fader { padding: 0; min-height: 0; display: block; cursor: pointer; touch-action: pan-y; }
+  .sr-look .sr-fader::before { content: 'Seek'; content: 'Seek' / ''; position: absolute; translate: -50% -50%; --nm: 2.42; }
+  .sr-look .sr-cells { position: absolute; top: 50%; translate: 0 -50%; display: flex; gap: calc(var(--u) * 1.2); flex: none; }
+  .sr-look .sr-cell { position: relative; background: #2a2c32; border-radius: calc(var(--u) * 1.5); min-width: 2px; }
+  .sr-look .sr-cell[data-played] { background: linear-gradient(180deg, var(--ember-hot), var(--ember) 55%, var(--ember-deep)); }
+  .sr-look .sr-cell[data-current] { background: linear-gradient(180deg, var(--ember-hot), var(--ember) 55%, var(--ember-deep)) 0 0 / calc(var(--fill, 0) * 100%) 100% no-repeat, #2a2c32; box-shadow: none; }
+  .sr-look .sr-cell[data-part]::after { content: ''; position: absolute; left: 0; top: calc(100% + var(--u) * 1.9); width: max(1px, calc(var(--u) * 0.5)); height: calc(var(--u) * 2.1); background: var(--sr-ink); }
+  .sr-look .sr-rider {
+    position: absolute; bottom: auto; inset-inline-end: auto; background: var(--im-rider) 0 0 / 200% 100% no-repeat; border-radius: 0; pointer-events: none; z-index: 1;
+  }
+  .sr-look .sr-fader:active .sr-rider { background-position: 100% 0; }
+
+  /* Level (desktop): a ridged roller shaded by a fixed layer, five lamps. */
+  .sr-look .sr-volume { display: block; padding: 0; min-width: 0; min-height: 0; border: 0; border-radius: 0; cursor: pointer; touch-action: pan-y; }
+  .sr-look .sr-volume[hidden], .sr-look[data-volume-readonly] .sr-volume { display: none !important; }
+  /* The wheel (the artist's baked layers): the tile scrolls behind the housing on transform only, clipped to the housing's window; the multiply and screen layers lie fixed over it. */
+  .sr-look .sr-lv-win { position: absolute; overflow: hidden; pointer-events: none; }
+  .sr-look .sr-lv-tile { position: absolute; display: block; pointer-events: none; transform: translateY(calc(var(--sr-level, 0) * var(--lv-step))); transition: transform 240ms var(--sr-ease); will-change: transform; }
+  .sr-look .sr-lv-mul, .sr-look .sr-lv-scr, .sr-look .sr-lv-house { position: absolute; display: block; pointer-events: none; background-repeat: no-repeat; }
+  .sr-look .sr-lv-mul { mix-blend-mode: multiply; }
+  .sr-look .sr-lv-scr { mix-blend-mode: screen; }
+  .sr-look .sr-volume::after { content: 'Volume'; content: 'Volume' / ''; position: absolute; left: calc(50% + var(--nx)); top: calc(50% + var(--ny)); translate: -50% -50%; }
+  .sr-look .sr-lamp {
+    position: absolute; left: calc(50% + var(--lx)); width: var(--lamp); height: var(--lamp); translate: -50% -50%; border: 0; border-radius: 0; box-sizing: border-box;
+    background: var(--im-lamps) 100% 0 / 200% 100% no-repeat;
+  }
+  .sr-look .sr-lamp[data-on] { background-position: 0 0; }
+  .sr-look .sr-lamp:nth-child(1) { top: calc(50% + var(--lstep) * 2); } .sr-look .sr-lamp:nth-child(2) { top: calc(50% + var(--lstep)); }
+  .sr-look .sr-lamp:nth-child(3) { top: 50%; } .sr-look .sr-lamp:nth-child(4) { top: calc(50% - var(--lstep)); } .sr-look .sr-lamp:nth-child(5) { top: calc(50% - var(--lstep) * 2); }
+
+  /* Focus: the same two-tone ring on every part, light on dark and dark on light. */
+  .sr-look :focus-visible { outline: 3px solid #fff; outline-offset: 2px; box-shadow: 0 0 0 5px var(--sr-ink); }
+  .sr-look .sr-btn:focus-visible, .sr-look .sr-hub:focus-visible, .sr-look .sr-reel:focus-visible { border-radius: 50%; }
+  .sr-look .sr-fader:focus-visible, .sr-look .sr-volume:focus-visible { border-radius: 8px; }
+
+  /* Full screen: the player is drawn as large as fits and centred; the page behind it is the grey ground. */
+  .sr-look.sr-player:is(:fullscreen,[data-theatre]) > * { --pad: 0px; --W: min(100cqw, calc(100cqh * var(--aspect))); --ox: calc((100cqw - var(--W)) / 2); --oy: calc((100cqh - var(--W) / var(--aspect)) / 2); }
+
+  /* A phone held sideways: the page, not the player, scrolls; reel.css's side-by-side arrangement is off. */
+  @media (orientation: landscape) and (max-height: 520px) { .sr-look.sr-player:not(:fullscreen):not([data-theatre]) { display: block; max-height: none; } }
+
+
+  /* Narrow pages. The phone layout keeps the approved names row (lamp left of each name) while it fits. Below that width (a host under 330 px wide, content box 289 px) the four lower names are centred under
+     their caps with the lamp on the cap's upper right corner and no tracking, so no two names touch and none leaves the body. */
+  @container reel (max-width: 289.98px) {
+    .sr-look .sr-btn::after { letter-spacing: 0; }
+    .sr-look :is(.sr-words, .sr-wait, .sr-full, .sr-sound)::after { left: 50%; translate: -50% -50%; }
+    .sr-look :is(.sr-words, .sr-wait, .sr-full, .sr-sound)::before { left: calc(50% + var(--F) * 0.36); top: calc(50% - var(--F) * 0.36); }
+    .sr-look .sr-again::after { left: calc(50% + var(--nx, 0px) - var(--u) * 11); }
+    .sr-look .sr-next::after { left: calc(50% + var(--nx, 0px) + var(--u) * 11); }
+    .sr-look .sr-time { left: calc(var(--ox) + var(--u) * 218); translate: -50% 0; width: calc(var(--u) * 130); justify-content: center; padding-left: 0; }
+    .sr-look .sr-time::before { display: none; }
+  }
+  /* Under the 320 px reflow reference (a host 320 px wide has a 281 px content box) the player is one unit: the 12 px text floor goes and every size already follows --u,
+     so the 320 layout scales down; the hit-area floor drops from 48 to 44 px and stays (a key's box is larger than its drawn cap, without overlapping its neighbour). Text is then under 12 px by the scale factor (stated in the README and A11Y-SPEC). */
+  @container reel (max-width: 281.98px) {
+    .sr-look * { --fl: 0px; --hit: 44px; }
+  }
+
+  /* Phone layout extras: rim keys carry their own glyph; the engraved word on the hub is drawn at the approved size. */
+  @container reel (max-width: 699.98px) {
+    .sr-look :is(.sr-again, .sr-next) { background-image: var(--im-rim); border-radius: 12px; padding-inline: calc((max(var(--hit), var(--Fw)) - var(--Fw)) / 2);
+      background-size: calc(var(--Fw) * 4) var(--Fh); background-origin: content-box; background-clip: content-box; background-position: left calc(var(--frame) * var(--Fw) * -1) center; }
+    .sr-look :is(.sr-again, .sr-next):active { background-position: left calc((var(--frame) + 1) * var(--Fw) * -1) center; }
+    .sr-look :is(.sr-again, .sr-next)::before { content: ''; position: absolute; left: calc(50% + var(--gx)); top: calc(50% + var(--gy)); translate: -50% -50%; width: var(--g); height: var(--g); background: var(--glyph) center / 100% 100% no-repeat; pointer-events: none; }
+    /* The phone layout has no Level control (the approved design has none); Up and Down still change the volume. */
+    .sr-look .sr-volume { display: none; }
+  }
+  @container reel (min-width: 700px) and (max-width: 759.98px) { @media not ((orientation: landscape) and (max-height: 520px)) {
+    .sr-look :is(.sr-again, .sr-next) { background-image: var(--im-rim); border-radius: 12px; padding-inline: calc((max(var(--hit), var(--Fw)) - var(--Fw)) / 2);
+      background-size: calc(var(--Fw) * 4) var(--Fh); background-origin: content-box; background-clip: content-box; background-position: left calc(var(--frame) * var(--Fw) * -1) center; }
+    .sr-look :is(.sr-again, .sr-next):active { background-position: left calc((var(--frame) + 1) * var(--Fw) * -1) center; }
+    .sr-look :is(.sr-again, .sr-next)::before { content: ''; position: absolute; left: calc(50% + var(--gx)); top: calc(50% + var(--gy)); translate: -50% -50%; width: var(--g); height: var(--g); background: var(--glyph) center / 100% 100% no-repeat; pointer-events: none; }
+    /* The phone layout has no Level control (the approved design has none); Up and Down still change the volume. */
+    .sr-look .sr-volume { display: none; }
+  } }
+}

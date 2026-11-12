@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <title>Linea, a Video.js 10 skin</title>
+  <meta name="description" content="Linea: a Video.js 10 skin machined like an instrument, that moves through a film one spoken line at a time.">
+  <script>document.documentElement.classList.add('js')</script>
+  <script type="module" crossorigin src="./assets/live-B7HNprGd.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/sentence-reel-BsVTIegq.js">
+  <link rel="modulepreload" crossorigin href="./assets/mixin-XUdiynj4.js">
+  <link rel="modulepreload" crossorigin href="./assets/fit-viewport-D98dmDeo.js">
+  <link rel="stylesheet" crossorigin href="./assets/sentence-reel-CjMtEQwh.css">
+</head>
+<body class="showcase">
+  <div class="sc-light" aria-hidden="true"></div>
+  <div class="sc-ring" aria-hidden="true"></div>
+  <nav class="sc-nav" aria-label="Sections">
+    <a class="sc-brand" href="#top"><svg class="sc-logo" viewBox="0 0 32 32" aria-hidden="true"><g class="sc-logo-notches"><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(0 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(30 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(60 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(90 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(120 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(150 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(180 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(210 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(240 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(270 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(300 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(330 16 16)"/></g><rect class="sc-logo-now" x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(270 16 16)"/><circle cx="16" cy="16" r="5.2" class="sc-logo-hub"/><circle cx="16" cy="16" r="2" class="sc-logo-core"/></svg>LINEA</a>
+    <a href="#anatomy">Anatomy</a><a href="#controls">Use it</a><a href="#anysite">Any site</a><a href="#states">States</a><a href="#thinking">Design</a><a href="#specs">Specs</a><a href="#access">Accessibility</a><a href="#install">Install</a>
+  </nav>
+  <main class="full" id="top">
+    <h1 class="sr-only">Linea, a Video.js 10 skin, playing Tears of Steel</h1>
+    <div class="hx">
+      <div class="hx-wheel" aria-hidden="true"><div class="hx-ring"></div><div class="hx-nums"></div><div class="hx-now"><i></i><span>Now</span></div></div>
+    <section id="hero" class="sc-hero sc-reveal" aria-labelledby="sc-title">
+      <p class="sc-eyebrow"><svg class="sc-logo" viewBox="0 0 32 32" aria-hidden="true"><g class="sc-logo-notches"><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(0 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(30 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(60 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(90 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(120 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(150 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(180 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(210 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(240 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(270 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(300 16 16)"/><rect x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(330 16 16)"/></g><rect class="sc-logo-now" x="15" y="1.5" width="2" height="5" rx="1" transform="rotate(270 16 16)"/><circle cx="16" cy="16" r="5.2" class="sc-logo-hub"/><circle cx="16" cy="16" r="2" class="sc-logo-core"/></svg>A skin for Video.js 10</p>
+      <h2 id="sc-title" class="sc-mark" data-split>LINEA</h2>
+      <p class="sc-lede">A film player machined like an instrument, that moves through a film <em>one spoken line at a time</em>.</p>
+    </section>
+    <div id="fit">
+    <div id="host" reel-title="Tears of Steel" sentences-src="./local/captions.vtt" eager-captions>
+      <video-player>
+        <media-container>
+          <hls-video controls src="./media/master.m3u8" poster="./local/poster.jpg" playsinline preload="auto" crossorigin="anonymous">
+            <track kind="captions" srclang="en" label="English" src="./local/captions.vtt" default>
+            <track kind="subtitles" srclang="es" label="Español" src="./local/captions-es.vtt">
+            <track kind="subtitles" srclang="de" label="Deutsch" src="./local/captions-de.vtt">
+            <track kind="subtitles" srclang="fr" label="Français" src="./local/captions-fr.vtt">
+          </hls-video>
+        </media-container>
+      </video-player>
+    </div>
+    </div>
+      <p class="hx-note"><span class="hx-dot" aria-hidden="true"></span>The wheel above is the player's own, drawn large: one notch for every spoken line, turning as the film speaks.</p>
+      <p class="hx-credit">Tears of Steel and its subtitles (CC) Blender Foundation, mango.blender.org, CC BY 3.0. Streamed from this site.</p>
+    </div>
+
+
+
+<section id="anatomy" class="sc-sec sc-reveal" aria-labelledby="s0">
+      <p class="sc-kicker">Anatomy</p>
+      <h2 id="s0" class="sc-h">Every control, where you expect it.</h2>
+      <p class="ax-lede">The five controls every player needs sit on the console, always in view. Linea's own keys sit beside them, named for what they do.</p>
+      <p class="ax-key"><span><i class="req"></i>Required by the brief</span><span><i></i>Linea's own</span><span><i class="new"></i>On the picture</span></p>
+      <div class="ax">
+        <div class="ax-col ax-left">
+          <p class="ax-zone">On the picture</p><ol class="ax-list"><li><button type="button" class="ax-it ax-own" data-i="0"><span class="ax-n">01</span><span class="ax-tx"><b>Film title</b><small>Top left. Fades with the controls.</small></span></button></li><li><button type="button" class="ax-it ax-new" data-i="1"><span class="ax-n">02</span><span class="ax-tx"><b>Pop out, AirPlay, Cast</b><small>Top right. Dimmed where your device cannot use them.</small></span></button></li><li><button type="button" class="ax-it ax-own" data-i="2"><span class="ax-n">03</span><span class="ax-tx"><b>The picture</b><small>Click to play or pause. Double-click for full screen.</small></span></button></li></ol><p class="ax-zone">On the console</p><ol class="ax-list"><li><button type="button" class="ax-it ax-req" data-i="3"><span class="ax-n">04</span><span class="ax-tx"><b>Seek bar</b><small>Drag or click to any moment.</small></span></button></li><li><button type="button" class="ax-it ax-own" data-i="4"><span class="ax-n">05</span><span class="ax-tx"><b>Caption line</b><small>The words being spoken now.</small></span></button></li><li><button type="button" class="ax-it ax-req" data-i="5"><span class="ax-n">06</span><span class="ax-tx"><b>Time</b><small>Where you are, and the length.</small></span></button></li><li><button type="button" class="ax-it ax-req" data-i="6"><span class="ax-n">07</span><span class="ax-tx"><b>Play / Pause</b><small>The centre of the wheel.</small></span></button></li><li><button type="button" class="ax-it ax-own" data-i="7"><span class="ax-n">08</span><span class="ax-tx"><b>Wheel</b><small>Turn it to go back or forward by lines.</small></span></button></li></ol>
+        </div>
+        <figure class="ax-fig">
+          <img src="./showcase/anatomy.webp" alt="Linea paused on a frame of Tears of Steel, every control in view" width="2382" height="2054">
+          <svg class="ax-svg" viewBox="0 0 1191 1027" aria-hidden="true"></svg>
+          <figcaption class="ax-now" aria-live="polite"></figcaption>
+        </figure>
+        <div class="ax-col ax-right">
+          <p class="ax-zone">The keys, left to right</p><ol class="ax-list"><li><button type="button" class="ax-it ax-own" data-i="8"><span class="ax-n">09</span><span class="ax-tx"><b>Repeat</b><small>Plays the line again.</small></span></button></li><li><button type="button" class="ax-it ax-own" data-i="9"><span class="ax-n">10</span><span class="ax-tx"><b>Next</b><small>Goes to the next line.</small></span></button></li><li><button type="button" class="ax-it ax-own" data-i="10"><span class="ax-n">11</span><span class="ax-tx"><b>Captions</b><small>Captions on or off.</small></span></button></li><li><button type="button" class="ax-it ax-own" data-i="11"><span class="ax-n">12</span><span class="ax-tx"><b>Step</b><small>Pauses after every line until you go on.</small></span></button></li><li><button type="button" class="ax-it ax-req" data-i="12"><span class="ax-n">13</span><span class="ax-tx"><b>Full screen</b><small>The film fills the screen.</small></span></button></li><li><button type="button" class="ax-it ax-req" data-i="13"><span class="ax-n">14</span><span class="ax-tx"><b>Mute</b><small>Sound off and on.</small></span></button></li><li><button type="button" class="ax-it ax-req" data-i="14"><span class="ax-n">15</span><span class="ax-tx"><b>Volume</b><small>Five steps, quieter to louder.</small></span></button></li></ol><p class="ax-zone">Under the console</p><ol class="ax-list"><li><button type="button" class="ax-it ax-own" data-i="15"><span class="ax-n">16</span><span class="ax-tx"><b>Settings</b><small>Speed, Language and Quality, in one tray.</small></span></button></li></ol>
+        </div>
+      </div>
+      <script>window.__ax={"W": 1191, "H": 1027, "items": [[1, "own", "Film title", "Top left. Fades with the controls.", [122, 124, 97, 11], "r", "title"], [2, "new", "Pop out, AirPlay, Cast", "Top right. Dimmed where your device cannot use them.", [916, 96, 136, 40], "r", "outs"], [3, "own", "The picture", "Click to play or pause. Double-click for full screen.", [85, 84, 979, 551], "r", "stage"], [4, "req", "Seek bar", "Drag or click to any moment.", [134, 640, 566, 48], "r", "seek"], [5, "own", "Caption line", "The words being spoken now.", [99, 686, 443, 62], "r", "window"], [6, "req", "Time", "Where you are, and the length.", [561, 686, 139, 62], "r", "time"], [7, "req", "Play / Pause", "The centre of the wheel.", [879, 684, 120, 120], "c", "hub"], [8, "own", "Wheel", "Turn it to go back or forward by lines.", [768, 573, 343, 343], "c", "reel"], [9, "own", "Repeat", "Plays the line again.", [98, 758, 70, 70], "c", "again"], [10, "own", "Next", "Goes to the next line.", [173, 758, 70, 70], "c", "next"], [11, "own", "Captions", "Captions on or off.", [250, 758, 70, 70], "c", "words"], [12, "own", "Step", "Pauses after every line until you go on.", [328, 751, 83, 83], "c", "wait"], [13, "req", "Full screen", "The film fills the screen.", [439, 758, 70, 70], "c", "full"], [14, "req", "Mute", "Sound off and on.", [548, 758, 70, 70], "c", "sound"], [15, "req", "Volume", "Five steps, quieter to louder.", [628, 754, 67, 78], "r", "level"], [16, "own", "Settings", "Speed, Language and Quality, in one tray.", [325, 880, 104, 44], "r", "pull"]]};</script>
+    </section>
+    <section id="controls" class="sc-sec sc-reveal" aria-labelledby="s1">
+      <p class="sc-num">01</p><p class="sc-kicker">How to use it</p>
+      <h2 id="s1" class="sc-h">What do you want to do?</h2>
+      <p class="hw-lede">Pick a question. The clip is the player itself, recorded doing exactly that; the white ring is where you press.</p>
+      <div class="hw">
+        <div class="hw-list" role="tablist" aria-label="What you can do"><button role="tab" class="hw-q" aria-selected="true" aria-controls="hw-stage" data-clip="repeat" data-act="again"><span class="hw-n">01</span><span class="hw-tx"><b class="hw-ask">Missed what they said?</b><span class="hw-ans">Press <b>Repeat</b>.</span></span></button><button role="tab" class="hw-q" aria-selected="false" aria-controls="hw-stage" data-clip="next" data-act="next"><span class="hw-n">02</span><span class="hw-tx"><b class="hw-ask">Want the next line?</b><span class="hw-ans">Press <b>Next</b>.</span></span></button><button role="tab" class="hw-q" aria-selected="false" aria-controls="hw-stage" data-clip="step" data-act="wait"><span class="hw-n">03</span><span class="hw-tx"><b class="hw-ask">Following along slowly?</b><span class="hw-ans">Turn on <b>Step</b>.</span></span></button><button role="tab" class="hw-q" aria-selected="false" aria-controls="hw-stage" data-clip="captions" data-act="words"><span class="hw-n">04</span><span class="hw-tx"><b class="hw-ask">Don't need the words?</b><span class="hw-ans">Press <b>Captions</b>.</span></span></button><button role="tab" class="hw-q" aria-selected="false" aria-controls="hw-stage" data-clip="wheel" data-act="wheel"><span class="hw-n">05</span><span class="hw-tx"><b class="hw-ask">Looking for a moment?</b><span class="hw-ans">Turn the <b>wheel</b>.</span></span></button><button role="tab" class="hw-q" aria-selected="false" aria-controls="hw-stage" data-clip="settings" data-act="tray"><span class="hw-n">06</span><span class="hw-tx"><b class="hw-ask">Another language?</b><span class="hw-ans">Open <b>Settings</b>.</span></span></button></div>
+        <figure class="hw-stage" id="hw-stage" role="tabpanel" aria-live="polite">
+          <video id="hw-vid" muted loop playsinline preload="metadata" poster="./showcase/how-repeat.webp" width="1400" height="1091"><source src="./showcase/how-repeat.mp4" type="video/mp4"></video>
+          <figcaption><button type="button" class="hw-try sc-try" data-try="again">Try it on the player</button></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="anysite" class="sc-sec sc-reveal" aria-labelledby="s2">
+      <p class="sc-num">02</p><p class="sc-kicker">Fits any site</p>
+      <h2 id="s2" class="sc-h">At home on any website, on any screen.</h2>
+      <p class="as-lede">A live Linea inside a sample page. Change the site, the device and the accent; the player re-lays itself out for the space it is given, and every lit part takes the accent.</p>
+      <div class="as-bar" role="group" aria-label="Try Linea on a site">
+        <div class="as-group"><span class="as-lab" id="as-l1">Site</span><div class="as-seg" role="radiogroup" aria-labelledby="as-l1"><button type="button" role="radio" class="as-opt" data-site="dark" aria-checked="true">Dark</button><button type="button" role="radio" class="as-opt" data-site="light" aria-checked="false">Light</button></div></div>
+        <div class="as-group"><span class="as-lab" id="as-l2">Device</span><div class="as-seg" role="radiogroup" aria-labelledby="as-l2"><button type="button" role="radio" class="as-opt" data-device="desktop" aria-checked="true">Desktop</button><button type="button" role="radio" class="as-opt" data-device="phone" aria-checked="false">Phone</button></div></div>
+        <div class="as-group"><span class="as-lab">Accent</span><div class="as-sws"><button type="button" class="as-sw" data-accent="#ff5a1f" aria-label="Ember" aria-pressed="true" style="--c:#ff5a1f"><span class="as-sw-dot"></span><span class="as-sw-name">Ember</span></button><button type="button" class="as-sw" data-accent="#2f8cff" aria-label="Signal blue" aria-pressed="false" style="--c:#2f8cff"><span class="as-sw-dot"></span><span class="as-sw-name">Signal blue</span></button><button type="button" class="as-sw" data-accent="#1fbf8f" aria-label="Studio green" aria-pressed="false" style="--c:#1fbf8f"><span class="as-sw-dot"></span><span class="as-sw-name">Studio green</span></button><button type="button" class="as-sw" data-accent="#e8b20e" aria-label="Brass" aria-pressed="false" style="--c:#e8b20e"><span class="as-sw-dot"></span><span class="as-sw-name">Brass</span></button></div></div>
+      </div>
+      <p class="as-note" id="as-note" hidden>On a phone the desktop view is a preview. Switch to Phone to try it here, or use the player at the top.</p>
+      <div class="as-stage" data-device="desktop" data-site="dark">
+        <div class="as-device">
+          <div class="as-chrome" aria-hidden="true"><i></i><i></i><i></i><span>yoursite.com/watch</span></div>
+          <div class="as-page">
+            <div class="as-nav" aria-hidden="true"><b></b><span></span><span></span><span></span></div>
+            <div class="as-kick" aria-hidden="true"></div><div class="as-title" aria-hidden="true"></div>
+            <div id="as-host" class="as-player" reel-title="Tears of Steel" sentences-src="./local/captions.vtt">
+              <video-player><media-container>
+                <hls-video src="./media/master.m3u8" poster="./local/poster.jpg" playsinline preload="metadata" crossorigin="anonymous">
+                  <track kind="captions" srclang="en" label="English" src="./local/captions.vtt" default>
+                  <track kind="subtitles" srclang="es" label="Español" src="./local/captions-es.vtt">
+                  <track kind="subtitles" srclang="de" label="Deutsch" src="./local/captions-de.vtt">
+                  <track kind="subtitles" srclang="fr" label="Français" src="./local/captions-fr.vtt">
+                </hls-video>
+              </media-container></video-player>
+            </div>
+            <div class="as-text" aria-hidden="true"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="states" class="sc-sec sc-reveal" aria-labelledby="s3">
+      <p class="sc-num">03</p><p class="sc-kicker">Every state</p>
+      <h2 id="s3" class="sc-h">Every moment of playback, shown.</h2>
+      <p class="ss-lede">From the first frame to the last, on a computer and on a phone. All 20 states, captured from the real player. Scroll the list, or pick one.</p>
+      <div class="ss">
+        <figure class="ss-view" data-kind="player" aria-live="polite">
+          <div class="ss-frame"><img id="ss-img" src="./showcase/s0-standby.webp" alt="Linea before play: the standby screen" width="1600" height="1262"><video id="ss-vid" muted loop playsinline preload="none" hidden><source src="./showcase/play-clip.mp4" type="video/mp4"></video></div>
+          <figcaption id="ss-cap">Ready to play</figcaption>
+        </figure>
+        <ol class="ss-list"><li class="ss-group"><p class="ss-zone">Start and end</p><ol><li><button type="button" class="ss-card" data-img="s0-standby" data-kind="player" aria-pressed="true"><span class="ss-n">01</span><span class="ss-body"><b>Ready to play</b><span class="ss-line">Before the film starts, the screen shows LINEA inside a slow ring. Nothing else asks for attention.</span><span class="ss-how"><em>How</em> Click the picture or press Play</span></span></button></li><li><button type="button" class="ss-card" data-img="st-loading" data-kind="player" aria-pressed="false"><span class="ss-n">02</span><span class="ss-body"><b>Loading</b><span class="ss-line">While the film is still arriving, the ring round Play turns until the picture is ready.</span><span class="ss-how"><em>When</em> the network is slow, or you jump ahead</span></span></button></li><li><button type="button" class="ss-card" data-img="st-end" data-kind="player" aria-pressed="false"><span class="ss-n">03</span><span class="ss-body"><b>The end</b><span class="ss-line">THE END appears on the glass and Play becomes Replay.</span><span class="ss-how"><em>How</em> Press Replay</span></span></button></li><li><button type="button" class="ss-card" data-img="st-error" data-kind="player" aria-pressed="false"><span class="ss-n">04</span><span class="ss-body"><b>Error</b><span class="ss-line">If the film cannot play, the screen says what went wrong and offers Retry.</span><span class="ss-how"><em>When</em> the video cannot load</span></span></button></li></ol></li><li class="ss-group"><p class="ss-zone">Watching</p><ol><li><button type="button" class="ss-card" data-img="play-clip" data-kind="player" data-clip="1" aria-pressed="false"><span class="ss-n">05</span><span class="ss-body"><b>Playing</b><span class="ss-line">Each word lights up as it is spoken.</span><span class="ss-how"><em>How</em> Press Play</span></span></button></li><li><button type="button" class="ss-card" data-img="s4-paused" data-kind="player" aria-pressed="false"><span class="ss-n">06</span><span class="ss-body"><b>Paused</b><span class="ss-line">The frame holds, the film title comes back top left, and the line stays so you keep your place.</span><span class="ss-how"><em>How</em> Press Pause or click the picture</span></span></button></li><li><button type="button" class="ss-card" data-img="st-fs-shown" data-kind="screen" aria-pressed="false"><span class="ss-n">07</span><span class="ss-body"><b>Full screen</b><span class="ss-line">The whole picture, as large as the screen allows, with the console floating over it.</span><span class="ss-how"><em>How</em> Press Full screen</span></span></button></li><li><button type="button" class="ss-card" data-img="st-fs-faded" data-kind="screen" aria-pressed="false"><span class="ss-n">08</span><span class="ss-body"><b>Controls faded</b><span class="ss-line">Two seconds after you stop moving, the console fades and the caption moves into the band under the film.</span><span class="ss-how"><em>When</em> full screen, playing or paused, mouse still</span></span></button></li></ol></li><li class="ss-group"><p class="ss-zone">Moving by line</p><ol><li><button type="button" class="ss-card" data-img="st-step-wait" data-kind="player" aria-pressed="false"><span class="ss-n">09</span><span class="ss-body"><b>Step</b><span class="ss-line">The Step knob is lit and the film waits on the last word of the line.</span><span class="ss-how"><em>How</em> Press Step</span></span></button></li><li><button type="button" class="ss-card" data-img="st-wheel" data-kind="player" aria-pressed="false"><span class="ss-n">10</span><span class="ss-body"><b>Turning the wheel</b><span class="ss-line">NOW marks where you are as the lines go by.</span><span class="ss-how"><em>How</em> Drag or turn the wheel</span></span></button></li></ol></li><li class="ss-group"><p class="ss-zone">Captions and language</p><ol><li><button type="button" class="ss-card" data-img="st-captions-off" data-kind="player" aria-pressed="false"><span class="ss-n">11</span><span class="ss-body"><b>Captions off</b><span class="ss-line">The words leave the screen and the window shows the film's title.</span><span class="ss-how"><em>How</em> Press Captions</span></span></button></li><li><button type="button" class="ss-card" data-img="s3-language" data-kind="player" aria-pressed="false"><span class="ss-n">12</span><span class="ss-body"><b>Another language</b><span class="ss-line">Choose a language in Settings and the line follows it.</span><span class="ss-how"><em>How</em> Settings, then Language</span></span></button></li></ol></li><li class="ss-group"><p class="ss-zone">Sound</p><ol><li><button type="button" class="ss-card" data-img="st-muted" data-kind="player" aria-pressed="false"><span class="ss-n">13</span><span class="ss-body"><b>Muted</b><span class="ss-line">Mute lights, and the screen confirms the level with 0%.</span><span class="ss-how"><em>How</em> Press Mute</span></span></button></li><li><button type="button" class="ss-card" data-img="st-volume" data-kind="player" aria-pressed="false"><span class="ss-n">14</span><span class="ss-body"><b>Volume</b><span class="ss-line">The screen shows the level as you change it.</span><span class="ss-how"><em>How</em> Use the Volume slider</span></span></button></li></ol></li><li class="ss-group"><p class="ss-zone">Settings and keyboard</p><ol><li><button type="button" class="ss-card" data-img="s2-tray" data-kind="player" aria-pressed="false"><span class="ss-n">15</span><span class="ss-body"><b>Settings</b><span class="ss-line">The tray rises from the Settings tab: a speed dial, then language and quality tiles.</span><span class="ss-how"><em>How</em> Press the Settings tab</span></span></button></li><li><button type="button" class="ss-card" data-img="st-focus" data-kind="player" aria-pressed="false"><span class="ss-n">16</span><span class="ss-body"><b>Keyboard focus</b><span class="ss-line">The ring marks the control that Enter will press; here, Full screen.</span><span class="ss-how"><em>How</em> <kbd>Tab</kbd></span></span></button></li></ol></li><li class="ss-group"><p class="ss-zone">On a phone</p><ol><li><button type="button" class="ss-card" data-img="phone-play" data-kind="portrait" aria-pressed="false"><span class="ss-n">17</span><span class="ss-body"><b>Phone, playing</b><span class="ss-line">The upright console: the line, the time and the wheel, stacked for one hand.</span><span class="ss-how"><em>How</em> any phone held upright</span></span></button></li><li><button type="button" class="ss-card" data-img="phone-tray" data-kind="portrait" aria-pressed="false"><span class="ss-n">18</span><span class="ss-body"><b>Phone, settings</b><span class="ss-line">The same tray, laid out for a phone.</span><span class="ss-how"><em>How</em> Tap Settings</span></span></button></li><li><button type="button" class="ss-card" data-img="phone-side" data-kind="landscape" aria-pressed="false"><span class="ss-n">19</span><span class="ss-body"><b>Phone, sideways</b><span class="ss-line">Turn the phone and the player fills the screen by itself, no button needed.</span><span class="ss-how"><em>How</em> turn the phone sideways</span></span></button></li><li><button type="button" class="ss-card" data-img="st-phone-side-faded" data-kind="landscape" aria-pressed="false"><span class="ss-n">20</span><span class="ss-body"><b>Sideways, controls faded</b><span class="ss-line">The caption sits on the picture itself; one touch brings the console back.</span><span class="ss-how"><em>When</em> sideways, and you have not touched the screen</span></span></button></li></ol></li></ol>
+      </div>
+    </section>
+
+    <section id="thinking" class="sc-sec sc-reveal" aria-labelledby="s4">
+      <p class="sc-num">04</p><p class="sc-kicker">Design thinking</p>
+      <h2 id="s4" class="sc-h">A timeline guesses. Linea knows.</h2>
+      <div class="sc-vs">
+        <figure class="sc-vs-a"><svg viewBox="0 0 320 140" aria-hidden="true"><rect x="20" y="74" width="280" height="6" rx="3" class="a-track"/><circle cx="120" cy="77" r="9" class="a-scrub"/><text x="120" y="50" class="a-q">?</text></svg><figcaption><b>A timeline</b>Drag, overshoot, drag back.</figcaption></figure>
+        <figure class="sc-vs-b"><svg viewBox="0 0 320 140" aria-hidden="true"><g class="a-lines2"><rect x="20" y="64" width="60" height="26" rx="6"/><rect x="88" y="64" width="80" height="26" rx="6" class="a-cur2"/><rect x="176" y="64" width="54" height="26" rx="6"/><rect x="238" y="64" width="62" height="26" rx="6"/></g></svg><figcaption><b>Linea</b>Every jump lands on the start of a line.</figcaption></figure>
+      </div>
+      <ul class="sc-stats">
+        <li><b data-count="86">0</b><span>notches on this film</span></li>
+        <li><b data-count="4">0</b><span>caption languages</span></li>
+        <li><b data-count="0">0</b><span>guessing</span></li>
+      </ul>
+    </section>
+
+    <section id="specs" class="sc-sec sc-reveal" aria-labelledby="s5">
+      <p class="sc-num">05</p><p class="sc-kicker">Specifications</p>
+      <h2 id="s5" class="sc-h">Built on Video.js 10.</h2>
+      <dl class="sc-spec">
+        <div><dt>Player</dt><dd>Video.js 10.3, HTML: <code>&lt;video-player&gt;</code>, <code>&lt;media-container&gt;</code> and any Video.js media element (<code>&lt;hls-video&gt;</code>, <code>&lt;mux-video&gt;</code>, a plain <code>&lt;video&gt;</code>).</dd></div>
+        <div><dt>Made of</dt><dd>HTML, CSS and TypeScript; layered renders of the body at 1x and 2x, AVIF with WebP fallback; one font family (Saira) under the Open Font License.</dd></div>
+        <div><dt>Captions</dt><dd>Read from the video's own tracks or a complete WebVTT file; HLS subtitle renditions are read from the playlist. No captions: the film is cut into 28 equal steps and every control still works.</dd></div>
+        <div><dt>Layouts</dt><dd>The layout follows the player&rsquo;s own width, not the window: wide from 760 px, upright below it.</dd></div>
+        <div><dt>Outputs</dt><dd>Picture in picture; AirPlay in Safari on a Mac and any browser on iPhone and iPad; Google Cast in Chrome and Edge on computers and Android, through Google&rsquo;s Cast SDK.</dd></div>
+        <div><dt>Site settings</dt><dd><code>--l-now</code> and <code>--ember</code> set the accent; <code>--sr-font-names</code> and <code>--sr-font-window</code> set the type.</dd></div>
+        <div><dt>Video</dt><dd>HLS with Auto, 1080p, 720p and 480p, served with honest peak bitrates, so Auto picks a size the connection can hold.</dd></div>
+        <div><dt>Weight</dt><dd>Skin code 54 KB gzipped, inside a 60 KB budget; 279 unit tests.</dd></div>
+      </dl>
+    </section>
+
+    <section id="access" class="sc-sec sc-reveal" aria-labelledby="s6">
+      <p class="sc-num">06</p><p class="sc-kicker">Accessibility</p>
+      <h2 id="s6" class="sc-h">Made for every viewer, and checked.</h2>
+      <ul class="sc-grid sc-grid-tight">
+        <li class="sc-tilt"><b>Readable over any video</b><span>Caption words at 18.4:1 on display glass. Captions on the picture are white with a dark edge, readable on bright and dark frames alike.</span></li>
+        <li class="sc-tilt"><b>Focus you can see</b><span>A 3 px white ring with a dark halo on every control, never removed.</span></li>
+        <li class="sc-tilt"><b>Every control by keyboard</b><span>Tab order follows the eye, and focus returns to Settings when the tray closes.</span></li>
+        <li class="sc-tilt"><b>Big enough for a thumb</b><span>Every target at least 44 by 44 pixels, measured by hit tests at every width from 360 to 1920 px.</span></li>
+        <li class="sc-tilt"><b>Calm on request</b><span>With reduced motion, the standby ring, the tray slide and the caption underline stand still.</span></li>
+        <li class="sc-tilt"><b>Named for screen readers</b><span>Every control has a spoken name; the wheel speaks the line it lands on.</span></li>
+        <li class="sc-tilt"><b>High contrast</b><span>Forced colours give a whole, plain layout in system colours, the spoken word marked with Highlight.</span></li>
+        <li class="sc-tilt"><b>Checked, not assumed</b><span>axe reports 0 violations on desktop and phone, on dark and light sites; tested in Chromium and WebKit, on an iPhone and in its simulator.</span></li>
+      </ul>
+      <dl class="sc-keys">
+        <div><dt><kbd>Space</kbd> <kbd>K</kbd></dt><dd>Play or pause</dd></div><div><dt><kbd>&larr;</kbd> <kbd>&rarr;</kbd></dt><dd>Previous or next line</dd></div><div><dt><kbd>A</kbd></dt><dd>Repeat the line</dd></div><div><dt><kbd>N</kbd></dt><dd>Next line</dd></div><div><dt><kbd>W</kbd></dt><dd>Step on or off</dd></div><div><dt><kbd>C</kbd></dt><dd>Captions on or off</dd></div><div><dt><kbd>J</kbd> <kbd>L</kbd></dt><dd>Back or forward 10 seconds</dd></div><div><dt><kbd>Shift</kbd> + <kbd>&larr;</kbd> <kbd>&rarr;</kbd></dt><dd>Back or forward 5 seconds</dd></div><div><dt><kbd>&uarr;</kbd> <kbd>&darr;</kbd></dt><dd>Volume</dd></div><div><dt><kbd>M</kbd></dt><dd>Mute</dd></div><div><dt><kbd>F</kbd></dt><dd>Full screen</dd></div><div><dt><kbd>&lt;</kbd> <kbd>&gt;</kbd></dt><dd>Speed</dd></div><div><dt><kbd>Home</kbd> <kbd>End</kbd></dt><dd>Start or end of the film</dd></div><div><dt><kbd>0</kbd> &ndash; <kbd>9</kbd></dt><dd>Jump to 0 to 90 percent</dd></div><div><dt><kbd>Esc</kbd></dt><dd>Close Settings</dd></div></dl>
+    </section>
+
+    <section id="install" class="sc-sec sc-reveal" aria-labelledby="s7">
+      <p class="sc-num">07</p><p class="sc-kicker">Install</p>
+      <h2 id="s7" class="sc-h">Add Linea to any page.</h2>
+      <ol class="sc-steps">
+        <li><b>Load Video.js and Linea</b><pre tabindex="0" aria-label="Code, scroll sideways to read"><code>&lt;script type="module" src="https://cdn.jsdelivr.net/npm/@videojs/cdn@10.3.0/video-player.js"&gt;&lt;/script&gt;
+&lt;script type="module" src="https://cdn.jsdelivr.net/npm/@videojs/cdn@10.3.0/ui/container.js"&gt;&lt;/script&gt;
+&lt;script type="module" src="https://cdn.jsdelivr.net/npm/@videojs/cdn@10.3.0/media/hls-video.js"&gt;&lt;/script&gt;
+&lt;link rel="stylesheet" href="https://akintadeaduralere-cmyk.github.io/linea/skin/linea.css"&gt;</code></pre><button class="sc-copy" type="button">Copy</button></li>
+        <li><b>Wrap your video</b><pre tabindex="0" aria-label="Code, scroll sideways to read"><code>&lt;div id="player" reel-title="My film"&gt;
+  &lt;video-player&gt;&lt;media-container&gt;
+    &lt;hls-video src="your-stream.m3u8" playsinline crossorigin&gt;
+      &lt;track kind="captions" srclang="en" label="English" src="captions.vtt" default&gt;
+    &lt;/hls-video&gt;
+  &lt;/media-container&gt;&lt;/video-player&gt;
+&lt;/div&gt;</code></pre><button class="sc-copy" type="button">Copy</button></li>
+        <li><b>Mount it</b><pre tabindex="0" aria-label="Code, scroll sideways to read"><code>&lt;script type="module"&gt;
+  import { mountSentenceReel } from 'https://akintadeaduralere-cmyk.github.io/linea/skin/linea.js';
+  const host = document.getElementById('player');
+  mountSentenceReel(host, host.querySelector('hls-video'));
+&lt;/script&gt;</code></pre><button class="sc-copy" type="button">Copy</button></li>
+      </ol>
+      <p class="sc-p">Open source under Apache 2.0. <a class="sc-link" href="https://github.com/akintadeaduralere-cmyk/linea">The code on GitHub</a></p>
+    </section>
+
+    <p class="credit">Linea is a self-initiated concept made for the Video.js skins challenge.</p>
+  </main>
+  <script src="./showcase.js" defer></script>
+</body>
+</html>

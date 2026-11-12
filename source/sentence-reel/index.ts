@@ -1,0 +1,11 @@
+export * from './constants.ts';
+export * from './types.ts';
+export { buildSentences, fallbackSegments, indexAt, progressIn, clampIndex, cleanCueText } from './sentences.ts';
+export { wordTimings, activeWordIndex } from './words.ts';
+export { keyAction } from './keys.ts';
+export { sliderIntent } from './slider-keys.ts';
+export { planNotches, notchOf, indexAtFraction } from './notches.ts';
+export { nextStopIndex, WaitGuard } from './wait.ts';
+export { formatTime } from './format.ts';
+export { ReelController, type Navigation, type NavSource, type ReelOptions } from './controller.ts';
+export { mountSentenceReel, type ReelHandle } from './mount.ts';
