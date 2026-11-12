@@ -277,8 +277,14 @@
     if (!cards.length || !view) return;
     var frame = view.querySelector('.ss-frame'), img = document.getElementById('ss-img'), vid = document.getElementById('ss-vid'), cap = document.getElementById('ss-cap'), cur = null;
     var CLIP = { 'phone-play': [600,964], 'phone-side': [1400,652], 'phone-tray': [600,992], 'play-clip': [1600,1302], 's0-standby': [1600,1302], 's2-tray': [1600,1304], 's3-language': [1600,1302], 's4-paused': [1600,1302], 'st-captions-off': [1600,1302], 'st-end': [1600,1302], 'st-error': [1600,1302], 'st-focus': [1600,1302], 'st-fs-faded': [1600,1112], 'st-fs-shown': [1600,1112], 'st-loading': [1600,1302], 'st-muted': [1600,1302], 'st-phone-side-faded': [1400,652], 'st-step-wait': [1600,1302], 'st-volume': [1600,1302], 'st-wheel': [1600,1302] };
-    var clipOf = function (n) { return './showcase/stv-' + n + '.mp4'; }, posterOf = function (n) { return './showcase/stv-' + n + '.webp'; };
-    var sizeOf = function (n) { return CLIP[n] || [1600, 1262]; };
+    var real = function (n) { return (typeof ALIAS !== 'undefined' && ALIAS[n]) || n; };
+    var clipOf = function (n) { return './showcase/stv-' + real(n) + '.mp4'; }, posterOf = function (n) { return './showcase/stv-' + real(n) + '.webp'; };
+    var sizeOf = function (n) { return CLIP[real(n)] || [1600, 1262]; };
+    // Loading and Error are moments in one small part of the player: their clips are close-ups of that part (the ring round
+    // Play, the message on the glass), cut from the same recordings at their own sharpness.
+    var ALIAS = { 'st-loading': 'st-loading-close', 'st-error': 'st-error-close' }, STILL = {};
+    CLIP['st-loading-close'] = [846,722]; CLIP['st-error-close'] = [888,274];
+    var stillOf = function (n) { return './showcase/' + n + '.webp'; };
     var phone = matchMedia('(max-width: 760px)'), viewSeen = false;
     var run = function (v) { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); };
     // Two video layers: the clip on screen keeps playing until the next one can play, then they swap, so a change of state
@@ -290,7 +296,7 @@
       cur = c;
       var n = c.getAttribute('data-img'), name = c.querySelector('b').textContent, wh = sizeOf(n), kind = c.getAttribute('data-kind');
       cap.textContent = name;
-      if (calm) { view.setAttribute('data-kind', kind); vids.forEach(function (v) { v.pause(); v.hidden = true; }); img.hidden = false; img.width = wh[0]; img.height = wh[1]; img.src = posterOf(n); img.alt = 'Linea: ' + name; return; }
+      if (calm || STILL[n]) { view.setAttribute('data-kind', kind); vids.forEach(function (v) { v.pause(); v.hidden = true; }); img.hidden = false; img.width = STILL[n] ? 1600 : wh[0]; img.height = STILL[n] ? 1262 : wh[1]; img.src = STILL[n] ? stillOf(n) : posterOf(n); img.alt = 'Linea: ' + name; return; }
       img.hidden = true;
       var my = ++ticket, back = vids[1 - front], shown = vids[front];
       back.preload = 'auto'; back.width = wh[0]; back.height = wh[1]; back.poster = posterOf(n); back.setAttribute('aria-label', 'Linea: ' + name);
@@ -303,7 +309,7 @@
     // A clip (or, with reduced motion, its still) in every card, for phones; it loads only when the card comes near.
     cards.forEach(function (c) {
       var n = c.getAttribute('data-img'), wh = sizeOf(n), el;
-      if (calm) { el = document.createElement('img'); el.alt = ''; el.loading = 'lazy'; el.decoding = 'async'; el.src = posterOf(n); }
+      if (calm || STILL[n]) { el = document.createElement('img'); el.alt = ''; el.loading = 'lazy'; el.decoding = 'async'; el.src = STILL[n] ? stillOf(n) : posterOf(n); if (STILL[n]) wh = [1600, 1262]; }
       else { el = document.createElement('video'); el.muted = true; el.defaultMuted = true; el.loop = true; el.playsInline = true; el.setAttribute('muted', ''); el.setAttribute('playsinline', ''); el.preload = 'none'; el.poster = posterOf(n); el.setAttribute('data-src', clipOf(n)); el.setAttribute('aria-hidden', 'true'); }
       el.className = 'ss-pic'; el.width = wh[0]; el.height = wh[1];
       var body = c.querySelector('.ss-body'); if (body) body.insertBefore(el, body.firstChild);
