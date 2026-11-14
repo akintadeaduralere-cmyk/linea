@@ -151,6 +151,13 @@
         opts.forEach(function (x) { var on = x === o; x.setAttribute('aria-checked', String(on)); x.tabIndex = on ? 0 : -1; });
         if (o.hasAttribute('data-site')) stage.setAttribute('data-site', o.getAttribute('data-site'));
         if (o.hasAttribute('data-device')) stage.setAttribute('data-device', o.getAttribute('data-device'));
+        // Skin: the second skin swaps the player's look class (sr-look silver, sr-smoked smoked glass); the player's parts and behaviour are the same.
+        if (o.hasAttribute('data-skin-opt')) {
+          var sp = stage.querySelector('.sr-player'), smoked = o.getAttribute('data-skin-opt') === 'smoked';
+          if (sp) { sp.classList.toggle('sr-look', !smoked); sp.classList.toggle('sr-smoked', smoked); sp.setAttribute('data-skin', smoked ? 'smoked' : 'silver'); }
+          stage.setAttribute('data-skin', smoked ? 'smoked' : 'silver');
+          requestAnimationFrame(function () { dispatchEvent(new Event('resize')); });
+        }
         fitDesk();
         if (focus) o.focus();
       };

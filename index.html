@@ -10,11 +10,11 @@
   <!-- The player's two fonts, fetched first: the hero is sized by measuring the player, which needs its real type (12 Nov 2026). -->
   <link rel="preload" as="font" type="font/woff2" crossorigin href="./assets/saira-bold-CKhi3vN9.woff2">
   <link rel="preload" as="font" type="font/woff2" crossorigin href="./assets/saira-semibold-ZsFeA_HP.woff2">
-  <script type="module" crossorigin src="./assets/live-DCWTCMJO.js"></script>
-  <link rel="modulepreload" crossorigin href="./assets/sentence-reel-DT8mKahh.js">
+  <script type="module" crossorigin src="./assets/live-DaWCaF5S.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/sentence-reel-BKNtN0RJ.js">
   <link rel="modulepreload" crossorigin href="./assets/mixin-XUdiynj4.js">
   <link rel="modulepreload" crossorigin href="./assets/fit-viewport-CDeBcfYg.js">
-  <link rel="stylesheet" crossorigin href="./assets/sentence-reel-B5THWYm7.css">
+  <link rel="stylesheet" crossorigin href="./assets/sentence-reel-CxxS6Kc9.css">
 </head>
 <body class="showcase">
   <div class="sc-light" aria-hidden="true"></div>
@@ -88,10 +88,11 @@
     <section id="anysite" class="sc-sec sc-reveal" aria-labelledby="s2">
       <p class="sc-num">02</p><p class="sc-kicker">Fits any site</p>
       <h2 id="s2" class="sc-h">At home on any website, on any screen.</h2>
-      <p class="as-lede">A live Linea inside a sample page. Change the site, the device and the accent; the player re-lays itself out for the space it is given, and every lit part takes the accent.</p>
+      <p class="as-lede">A live Linea inside a sample page. Change the site, the device, the skin and the accent; the player re-lays itself out for the space it is given, and every lit part takes the accent.</p>
       <div class="as-bar" role="group" aria-label="Try Linea on a site">
         <div class="as-group"><span class="as-lab" id="as-l1">Site</span><div class="as-seg" role="radiogroup" aria-labelledby="as-l1"><button type="button" role="radio" class="as-opt" data-site="dark" aria-checked="true">Dark</button><button type="button" role="radio" class="as-opt" data-site="light" aria-checked="false">Light</button></div></div>
         <div class="as-group"><span class="as-lab" id="as-l2">Device</span><div class="as-seg" role="radiogroup" aria-labelledby="as-l2"><button type="button" role="radio" class="as-opt" data-device="desktop" aria-checked="true">Desktop</button><button type="button" role="radio" class="as-opt" data-device="phone" aria-checked="false">Phone</button></div></div>
+        <div class="as-group"><span class="as-lab" id="as-l4">Skin</span><div class="as-seg" role="radiogroup" aria-labelledby="as-l4"><button type="button" role="radio" class="as-opt" data-skin-opt="silver" aria-checked="true">Silver</button><button type="button" role="radio" class="as-opt" data-skin-opt="smoked" aria-checked="false">Smoked glass</button></div></div>
         <div class="as-group"><span class="as-lab">Accent</span><div class="as-sws"><button type="button" class="as-sw" data-accent="#ff5a1f" aria-label="Ember" aria-pressed="true" style="--c:#ff5a1f"><span class="as-sw-dot"></span><span class="as-sw-name">Ember</span></button><button type="button" class="as-sw" data-accent="#2f8cff" aria-label="Signal blue" aria-pressed="false" style="--c:#2f8cff"><span class="as-sw-dot"></span><span class="as-sw-name">Signal blue</span></button><button type="button" class="as-sw" data-accent="#1fbf8f" aria-label="Studio green" aria-pressed="false" style="--c:#1fbf8f"><span class="as-sw-dot"></span><span class="as-sw-name">Studio green</span></button><button type="button" class="as-sw" data-accent="#e8b20e" aria-label="Brass" aria-pressed="false" style="--c:#e8b20e"><span class="as-sw-dot"></span><span class="as-sw-name">Brass</span></button></div></div>
       </div>
       <p class="as-note" id="as-note" hidden>On a phone the desktop view is a preview. Switch to Phone to try it here, or use the player at the top.</p>
@@ -155,7 +156,8 @@
         <div><dt>Outputs</dt><dd>Picture in picture; AirPlay in Safari on a Mac and any browser on iPhone and iPad; Google Cast in Chrome and Edge on computers and Android, through Google&rsquo;s Cast SDK.</dd></div>
         <div><dt>Site settings</dt><dd><code>--l-now</code> and <code>--ember</code> set the accent; <code>--sr-font-names</code> and <code>--sr-font-window</code> set the type.</dd></div>
         <div><dt>Video</dt><dd>HLS with Auto, 1080p, 720p and 480p, served with honest peak bitrates, so Auto picks a size the connection can hold.</dd></div>
-        <div><dt>Weight</dt><dd>Skin code 54 KB gzipped, inside a 60 KB budget; 279 unit tests.</dd></div>
+        <div><dt>Skins</dt><dd>Two: Silver, the default, and Smoked glass, the same controls in a smoked-glass body that shows the belt-driven machine inside. Add skin="smoked" to the player to use it.</dd></div>
+        <div><dt>Weight</dt><dd>Skin code for both skins 61 KB gzipped, inside a 64 KB budget; 282 unit tests.</dd></div>
       </dl>
     </section>
 
@@ -202,6 +204,6 @@
 
     <p class="credit">Linea is a self-initiated concept made for the Video.js skins challenge.</p>
   </main>
-  <script src="./showcase.js?v=20261112h" defer></script>
+  <script src="./showcase.js?v=20261114a" defer></script>
 </body>
 </html>
