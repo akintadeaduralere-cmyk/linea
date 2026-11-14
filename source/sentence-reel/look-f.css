@@ -533,3 +533,26 @@
    the lit ring and the lit notch are rendered in ember; a site that sets its own accent also sets --sr-accent-turn (the hue turn from
    ember, about 16 degrees, to its accent) and those parts turn with their shading kept. Grey metal in the same layers stays grey. */
 .sr-look[data-ember-layers] :is(.sr-rider, .sr-a-arm, .sr-ring-current, .sr-notch[data-current] .sr-notch-face) { filter: hue-rotate(var(--sr-accent-turn, 0deg)); }
+
+/* Settings tray on phones (owner, 14 Nov 2026: the tray "cut short", Speed, Language and Quality "overlap on the line").
+   On phones the tiles keep a 44 px touch size, so they can need more room than the rendered plate is drawn for. Two fixes:
+   1. The plate is drawn as a nine-slice: its top (notch and knob) and its rims keep their drawn size, and only the plain
+      brushed band between them grows, so the plate always reaches below the last row. Where the tiles already fitted, the
+      plate draws exactly as before.
+   2. The tiles in a row share the row's width instead of running past the tray's edge on the narrowest phones. */
+.sr-look.sr-player .sr-tiles .sr-group { min-width: 0; max-width: 100%; }
+.sr-look.sr-player :is(.sr-radios .sr-radio, .sr-outputs .sr-output) { flex: 0 1 auto; min-width: 0; }
+@media not (forced-colors: active) {
+  @container reel (max-width: 759.98px) {
+    .sr-look.sr-player .sr-tray-in { background-image: none; border-style: solid; border-width: 0;
+      /* A plain url, never image-set(): WebKit (every iPhone browser) slices an image-set() border image against the wrong size, which drew the dial well squashed with a seam under it. */
+      border-image-source: url(./assets/tray/p-tray-bare@2x.webp);
+      border-image-slice: 81.5% 2.2% 4.9% 2.2% fill; border-image-repeat: stretch;
+      border-image-width: calc(var(--u) * 191 * 0.815) calc(var(--u) * 430 * 0.022) calc(var(--u) * 191 * 0.049) calc(var(--u) * 430 * 0.022);
+      padding-bottom: max(calc(var(--u) * 7), 12px); }
+  }
+}
+
+/* The SETTINGS tab and the tray never cross (drawer.ts sets the distance): the tab steps clear in the same frame the tray starts to arrive,
+   and glides back only once the tray has gone. So the glide applies while the tray is shut, never while it is open. */
+@media (prefers-reduced-motion: no-preference) { .sr-look.sr-player:not([data-drawer]) > .sr-pull { transition: translate 140ms var(--sr-ease); } }
