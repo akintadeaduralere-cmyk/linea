@@ -35,7 +35,35 @@ export function buildReel(c: ReelController, signal: AbortSignal, rtl: () => boo
   // The baked ring for a 16-sentence film: three static pictures (unplayed, played through a mask, the current notch). Present always, shown and loaded only for 16 notches.
   const ring = el('span', 'sr-ring', { 'aria-hidden': 'true' });
   ring.append(el('i', 'sr-ring-unplayed'), el('i', 'sr-ring-played'), el('i', 'sr-ring-current'));
-  root.append(ring, notches, fine, disc.root, beads);
+  // Smoked glass draws one fine tick per spoken line as vector strokes (hidden on silver by look-smoked.css): every tick the same width, every fifth longer.
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  const ticks = document.createElementNS(SVGNS, 'svg');
+  ticks.setAttribute('class', 'sr-ticks'); ticks.setAttribute('aria-hidden', 'true'); ticks.setAttribute('focusable', 'false'); ticks.setAttribute('viewBox', '-170 -170 340 340');
+  const tickAll = document.createElementNS(SVGNS, 'path'); tickAll.setAttribute('class', 'sr-tk-all');
+  const tickLit = document.createElementNS(SVGNS, 'path'); tickLit.setAttribute('class', 'sr-tk-lit');
+  const tickNow = document.createElementNS(SVGNS, 'path'); tickNow.setAttribute('class', 'sr-tk-now');
+  ticks.append(tickAll, tickLit, tickNow);
+  let tickCount = -1; let tickLine = -1;
+  /** Tick i stands at i steps anticlockwise from the top, so the ring turning clockwise brings line after line under the NOW index. */
+  let longNow = -1;
+  const tickPath = (from: number, to: number, count: number): string => {
+    let d = '';
+    for (let i = from; i < to; i += 1) {
+      const a = (i / count) * 2 * Math.PI; const sx = -Math.sin(a); const cy = -Math.cos(a); const r0 = i % 5 === 0 || longNow === i ? 150 : 156;
+      d += `M${(sx * r0).toFixed(2)} ${(cy * r0).toFixed(2)}L${(sx * 165).toFixed(2)} ${(cy * 165).toFixed(2)}`;
+    }
+    return d;
+  };
+  const drawTicks = (count: number, line: number): void => {
+    if (count !== tickCount) { tickCount = count; tickAll.setAttribute('d', count > 0 ? tickPath(0, count, count) : ''); tickLine = -1; }
+    if (line !== tickLine) {
+      tickLine = line;
+      // The played ticks, and under NOW the current one as a fine full-length needle running on from the index.
+      tickLit.setAttribute('d', count > 0 && line > 1 ? tickPath(0, Math.min(line - 1, count), count) : '');
+      longNow = line - 1; tickNow.setAttribute('d', count > 0 && line > 0 ? tickPath(line - 1, line, count) : ''); longNow = -1;
+    }
+  };
+  root.append(ring, notches, fine, disc.root, beads, ticks);
   let notchEls: HTMLElement[] = [];
   let current = -2;
   let lastNav = 0;
@@ -67,6 +95,8 @@ export function buildReel(c: ReelController, signal: AbortSignal, rtl: () => boo
   let lastNotch = -1;
   /** The notch pressed on (a tap goes to it), or -1 when the press was not on a notch. */
   let tapNotch = -1;
+  let smokedDrag = false;
+  let lastStart = 0;
   let moved = false;
   /** The disc's centre and scale, read once when a press begins (not on every move: a drag must not force a layout per pointer event). */
   let geo: { cx: number; cy: number; perMm: number } | null = null;
@@ -87,14 +117,17 @@ export function buildReel(c: ReelController, signal: AbortSignal, rtl: () => boo
     const at = polar(e);
     const s = c.state();
     if (!at || !s.ready) return;
+    // Smoked glass: one tick per line, NOW at twelve o'clock, the ring turning clockwise as the film plays (earlier lines lie clockwise of NOW).
+    smokedDrag = root.closest('.sr-smoked') !== null;
     const plan = planNotches(s.count);
-    const now = notchOf(plan, s.index);
+    const now = smokedDrag ? s.index : notchOf(plan, s.index);
+    const count = smokedDrag ? s.count : plan.count;
     const inBand = at.mm >= (cssNumber(root, '--band-in') || 61.5) - 2 && at.mm <= (cssNumber(root, '--band-out') || 70.5) + 2;
-    tapNotch = inBand ? notchUnder(at.angle, plan.count, now) : -1;
+    tapNotch = !inBand ? -1 : smokedDrag ? (((Math.round(now - at.angle / (360 / Math.max(1, count)))) % count) + count) % count : notchUnder(at.angle, plan.count, now);   // the line drawn under the pointer, all the way round
     moved = false;
-    drag = new DialDrag(at.angle, now, plan.count);
+    drag = new DialDrag(at.angle, now, count);
     dragPointer = e.pointerId;
-    lastNotch = now;
+    lastNotch = now; lastStart = now;
     try { root.setPointerCapture(e.pointerId); } catch { /* capture is a nicety: the drag still works while the pointer stays on the disc */ }
     root.focus({ preventScroll: true });
     e.preventDefault();
@@ -103,17 +136,18 @@ export function buildReel(c: ReelController, signal: AbortSignal, rtl: () => boo
     if (!drag || e.pointerId !== dragPointer) return;
     const at = polar(e);
     if (!at) return;
-    const notch = drag.move(at.angle);
+    const back = drag.move(at.angle);
+    const notch = smokedDrag ? Math.min(c.state().count - 1, Math.max(0, lastStart + Math.round(drag.turnedPitches))) : back;
     // Turned by more than half a pitch (even if the first or last sentence stops it) is a drag, not a tap.
     if (Math.abs(drag.turnedPitches) >= 0.5) moved = true;
     if (notch === lastNotch) return;
     lastNotch = notch;
-    move(planNotches(c.state().count).firstIndex[notch]);
+    move(smokedDrag ? notch : planNotches(c.state().count).firstIndex[notch]);
   }, { signal });
   const release = (e: PointerEvent): void => {
     if (e.pointerId !== dragPointer) return;
     // A tap: pressed on a notch and let go without turning the reel.
-    if (e.type === 'pointerup' && !moved && tapNotch >= 0) move(planNotches(c.state().count).firstIndex[tapNotch]);
+    if (e.type === 'pointerup' && !moved && tapNotch >= 0) move(smokedDrag ? tapNotch : planNotches(c.state().count).firstIndex[tapNotch]);
     drag = null;
     dragPointer = -1;
     tapNotch = -1;
@@ -173,7 +207,22 @@ export function buildReel(c: ReelController, signal: AbortSignal, rtl: () => boo
       current = now;
       root.style.setProperty('--sr-now', String(Math.max(0, now)));
     }
-    disc.update(s);
+    // The line list is often complete before the media is ready (the seek slots are drawn from it at rest): smoked glass counts from it.
+    const listed = c.sentenceList().length; const lineCount = s.count > 0 ? s.count : listed;
+    disc.update(s, lineCount);
+    drawTicks(lineCount, s.ready && s.count > 0 ? s.index + 1 : 0);
+    // The smoked-glass skin prints "LINE 04 / 86" in its caption window from these two (CSS counters); the silver look does not use them.
+    const host = root.closest<HTMLElement>('.sr-player');
+    if (host && !host.hasAttribute('data-sr-lines')) {
+      // Leave the host's markup as it was found when the player is taken down.
+      host.setAttribute('data-sr-lines', '');
+      signal.addEventListener('abort', () => { host.style.removeProperty('--sr-line'); host.style.removeProperty('--sr-lines'); host.removeAttribute('data-sr-lines'); if (!host.getAttribute('style')) host.removeAttribute('style'); }, { once: true });
+    }
+    if (host) {
+      const line = String(s.ready && s.count > 0 ? s.index + 1 : 0), lines = String(lineCount);
+      if (host.style.getPropertyValue('--sr-line') !== line) host.style.setProperty('--sr-line', line);
+      if (host.style.getPropertyValue('--sr-lines') !== lines) host.style.setProperty('--sr-lines', lines);
+    }
     // The plain layout's progress bar only (hidden in the look): written only when it moves a visible amount.
     const prog = (Math.round(s.progress * 50) / 50).toFixed(2);
     if (fine.style.getPropertyValue('--sr-progress') !== prog) fine.style.setProperty('--sr-progress', prog);

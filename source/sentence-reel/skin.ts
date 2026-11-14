@@ -7,3 +7,4 @@ import './ember-layers.css';
 import './look.css';
 import './look-f.css';
 import './tray-layout.css';
+import './look-smoked.css';

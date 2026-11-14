@@ -24,3 +24,19 @@ export function activeWordIndex(timings: readonly WordTiming[], t: number): numb
   for (let i = timings.length - 1; i >= 0; i--) if (t >= timings[i].start) return i;
   return -1;
 }
+
+/** Word-initial apostrophes that stand for missing letters ('cause, 'em), so they keep the apostrophe shape. */
+const ELISION = /^'(?=(?:em|til|cause|bout|round|n|tis|twas|s)\b)/i;
+
+/**
+ * Typographer's quotes for one displayed word (owner, 14 Nov 2026: curly, as in the approved render).
+ * Subtitle files carry straight ' and "; the window shows ’ ‘ “ ”. Screen-reader text is left as the file has it.
+ */
+export function typeset(word: string): string {
+  return word
+    .replace(ELISION, '\u2019')
+    .replace(/^'/, '\u2018')
+    .replace(/'/g, '\u2019')
+    .replace(/^"/, '\u201C')
+    .replace(/"/g, '\u201D');
+}

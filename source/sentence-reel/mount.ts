@@ -64,6 +64,10 @@ export function mountSentenceReel(host: HTMLElement, media: HTMLMediaElement, op
   const title = options.title ?? host.getAttribute('reel-title') ?? media.getAttribute?.('reel-title') ?? '';
   const art = buildArt();
   const controls = buildControls(controller, signal, rtl, title);
+  // Smoked glass on a desktop-width player: Tab follows the face (key row, then the reel at the right). Watches the skin class and the width.
+  const syncRow = (): void => controls.smokedRow(host.classList.contains('sr-smoked') && host.getBoundingClientRect().width >= 760);
+  if (typeof MutationObserver === 'function') { const mo = new MutationObserver(syncRow); mo.observe(host, { attributes: true, attributeFilter: ['class'] }); signal.addEventListener('abort', () => mo.disconnect(), { once: true }); }
+  if (typeof ResizeObserver === 'function') { const ro = new ResizeObserver(syncRow); ro.observe(host); signal.addEventListener('abort', () => ro.disconnect(), { once: true }); }
   const sentenceWindow = new SentenceWindow(title);
   // One caption: the dot window is it. The picture never draws the text track (the guard hides its drawing; the track still loads and stays for assistive tech).
   // In full screen, only while the deck is hidden, a strip of the same dots carries the sentence on the picture.
@@ -107,7 +111,8 @@ export function mountSentenceReel(host: HTMLElement, media: HTMLMediaElement, op
 
   sentenceWindow.watch(signal);
   strip.watch(signal);
-  host.classList.add('sr-player', 'sr-look');
+  // Two skins: silver (the default, .sr-look) and smoked glass (skin="smoked" on the player, .sr-smoked). Same parts and behaviour, different look.
+  host.classList.add('sr-player', host.getAttribute('skin') === 'smoked' ? 'sr-smoked' : 'sr-look');
   host.tabIndex = -1;
   if (!restore.role) host.setAttribute('role', 'group');
   if (!restore.label) host.setAttribute('aria-label', LABELS.player);

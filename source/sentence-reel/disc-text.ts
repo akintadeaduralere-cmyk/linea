@@ -15,7 +15,7 @@ const GENERIC = 'Turn to seek · one notch · one sentence';
 
 export interface DiscText {
   root: SVGSVGElement;
-  update(state: ReelState): void;
+  update(state: ReelState, lineCount?: number): void;
 }
 
 function readNumber(node: Element, name: string): number {
@@ -63,6 +63,8 @@ export function buildDiscText(host: HTMLElement, signal: AbortSignal, title: str
   const name = make('arc-name', 'sr-disc-name');
   const middle = make('arc-title', 'sr-disc-title');
   const generic = make('arc-generic', 'sr-disc-generic');
+  // Smoked glass only (hidden on silver by look-smoked.css): the line count engraved over the top of the name band, upright.
+  const countLine = make('arc-count', 'sr-disc-count');
   name.along.textContent = SKIN_NAME.toUpperCase();
   generic.along.textContent = GENERIC.toUpperCase();
   const shown = title.trim().slice(0, TITLE_MAX).toUpperCase();
@@ -83,6 +85,9 @@ export function buildDiscText(host: HTMLElement, signal: AbortSignal, title: str
       line.text.setAttribute('font-size', (cap / DEFAULT_CAP_RATIO).toFixed(2));
       lengths.set(line, radius * ((ARC_SPAN_DEGREES * Math.PI) / 180));
     }
+    const top = readNumber(svg, '--arc-count-r') || 36;
+    countLine.path.setAttribute('d', `M ${-top} 0 A ${top} ${top} 0 0 1 ${top} 0`);
+    countLine.text.setAttribute('font-size', ((readNumber(svg, '--arc-count-cap') || 1.7) / DEFAULT_CAP_RATIO).toFixed(2));
     choose();
   }
 
@@ -108,9 +113,13 @@ export function buildDiscText(host: HTMLElement, signal: AbortSignal, title: str
   void host.ownerDocument.fonts?.ready.then(() => { if (!signal.aborted) fit(); });
 
   let last = '';
-  function update(s: ReelState): void {
+  function update(s: ReelState, lineCount = 0): void {
     const count = s.ready && s.totalKnown && s.count > 0 ? `${s.count} ${s.count === 1 ? 'sentence' : 'sentences'}`.toUpperCase() : '';
     const line = [shown, count].filter(Boolean).join(' · ');
+    // Known as soon as the caption list is in, before the media can play, so the engraving is there at rest.
+    const n = s.totalKnown && s.count > 0 ? s.count : lineCount;
+    const lines = n > 0 ? `${n} ${n === 1 ? 'line' : 'lines'} · one notch each`.toUpperCase() : '';
+    if (countLine.along.textContent !== lines) countLine.along.textContent = lines;
     if (line === last) return;
     last = line;
     candidates = [line, count, shown].filter((c, i, all) => c && all.indexOf(c) === i);

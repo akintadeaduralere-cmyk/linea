@@ -2,7 +2,7 @@ import { el, setAttr } from './dom.ts';
 import { LABELS } from './labels.ts';
 import type { ReelState, WordTiming } from './types.ts';
 import { linesPerPageFor, pageOfWord } from './window-fit.ts';
-import { activeWordIndex, wordTimings } from './words.ts';
+import { activeWordIndex, typeset, wordTimings } from './words.ts';
 
 
 /** Closing punctuation at the end of a sentence. */
@@ -157,7 +157,7 @@ export class SentenceWindow {
     this.spans = timings.map((t, i) => {
       // A full stop at the end of the sentence is not drawn in the window (the board shows none); it stays in the page text for screen readers.
       const tail = i === timings.length - 1 ? SENTENCE_TAIL.exec(t.word) : null;
-      const span = el('span', 'sr-word', {}, tail ? t.word.slice(0, tail.index) : t.word);
+      const span = el('span', 'sr-word', {}, typeset(tail ? t.word.slice(0, tail.index) : t.word));
       if (tail) span.append(el('span', 'sr-stop', {}, tail[0]));
       p.append(span);
       if (i < timings.length - 1) p.append(document.createTextNode(' '));
@@ -218,7 +218,9 @@ export class SentenceWindow {
     const span = this.spans[i]; const sentence = span?.parentElement;
     if (span && sentence && typeof span.getBoundingClientRect === 'function' && span.isConnected) {
       const r = span.getBoundingClientRect(); const base = sentence.getBoundingClientRect();
-      if (r.width > 0) { left = r.left - base.left; width = r.width; }
+      // Boxes come back in screen pixels; the underline moves in the sentence's own pixels. They differ when a page scales the player (CSS zoom or a transform).
+      const k = sentence.offsetWidth > 0 && base.width > 0 ? base.width / sentence.offsetWidth : 1;
+      if (r.width > 0) { left = (r.left - base.left) / k; width = r.width / k; }
     }
     if (i < 0 || left === undefined || width === undefined || top === undefined || !(width > 0)) { ul.setAttribute('data-off', ''); return; }
     const pitch = m?.linePitch ?? m?.lineHeight ?? 0;

@@ -16,6 +16,8 @@ export interface Controls {
   /** The Play key: where focus goes back to after the message is dismissed. */
   hub: HTMLButtonElement;
   update(state: ReelState): void;
+  /** Tab order for the smoked-glass desktop layout, where Repeat and Next sit in the key row and the reel stands at the right: true moves them there, false restores silver's order. */
+  smokedRow(on: boolean): void;
 }
 
 /** `sign` is drawn before the digits (the minus of the remaining time); `after` is spoken after them. */
@@ -124,5 +126,12 @@ export function buildControls(c: ReelController, signal: AbortSignal, rtl: () =>
     paintTime(s);
   }
 
-  return { root, reel: reel.root, wait, full, hub, update };
+  let rowOn = false;
+  function smokedRow(on: boolean): void {
+    if (on === rowOn) return;
+    rowOn = on;
+    if (on) { keys.prepend(again, next); root.insertBefore(reelGroup, keys.nextSibling); }
+    else { reelGroup.prepend(again); reelGroup.insertBefore(next, hub); root.insertBefore(reelGroup, keys); }
+  }
+  return { root, reel: reel.root, wait, full, hub, update, smokedRow };
 }
