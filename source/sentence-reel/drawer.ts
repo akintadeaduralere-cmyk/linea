@@ -253,32 +253,19 @@ export function buildDrawer(o: DrawerOptions): Drawer {
     pull.setAttribute('aria-expanded', 'true');
     host.setAttribute('data-drawer', 'open');
     // However many rows the media gives the tray (Quality appears with a stream), the SETTINGS tab moves to sit just below it, never under it.
-    // Placed at once, from the tray's laid-out height (its slide-in is a transform and does not change layout), so the tab is never left over the tiles
-    // while the tray arrives; measured again once the tray has settled, in case a row arrived late.
-    placePull();
-    doc.defaultView?.setTimeout(placePull, 600);
+    doc.defaultView?.setTimeout(() => {
+      if (!isOpen || big()) return;   // full screen: tab and tray sit top right, nothing to move
+      const tray = panel.querySelector('.sr-tray-in')?.getBoundingClientRect() ?? panel.getBoundingClientRect();
+      pull.style.translate = '';
+      const gap = tray.bottom + 6 - pull.getBoundingClientRect().top;
+      if (gap > 0) pull.style.translate = `0 ${Math.ceil(gap)}px`;
+    }, 600);
     if (!artStarted) {
       artStarted = true;
       panel.setAttribute('data-art', 'loading');
       Promise.resolve(o.loadArt?.()).then(() => panel.setAttribute('data-art', 'ready'), () => panel.setAttribute('data-art', 'failed'));
     }
   }
-  let pullShift = 0;
-  function placePull(): void {
-    if (!isOpen || big()) return;   // full screen: tab and tray sit top right, nothing to move
-    // Measured on the drawer, which holds still while the tray slides in inside it (their bottoms are the same once it has settled).
-    // Where a page shows the player scaled (a zoomed or transformed preview), drawn pixels and the tab's own pixels differ by that scale.
-    const scale = host.offsetWidth > 0 ? host.getBoundingClientRect().width / host.offsetWidth || 1 : 1;
-    // The tab's resting top is its drawn top less the shift it is showing right now (it may be mid-glide).
-    const shown = parseFloat((doc.defaultView?.getComputedStyle(pull).translate ?? '').split(' ')[1] ?? '0') || 0;
-    const restTop = pull.getBoundingClientRect().top - shown * scale;
-    const gap = Math.ceil((panel.getBoundingClientRect().bottom - restTop) / scale + 6);
-    const next = gap > 0 ? gap : 0;
-    if (next === pullShift) return;
-    pullShift = next;
-    pull.style.translate = next ? `0 ${next}px` : '';
-  }
-  const restPull = (): void => { pullShift = 0; pull.style.translate = ''; };
   let closeTimer: number | undefined;
   function close(): void {
     if (!isOpen) return;
@@ -286,14 +273,14 @@ export function buildDrawer(o: DrawerOptions): Drawer {
     setDeckInert(false);
     if (supportsPopover) { try { (panel as unknown as { hidePopover(): void }).hidePopover(); } catch { /* already hidden */ } }
     pull.setAttribute('aria-expanded', 'false');
+    pull.style.translate = '';
     host.removeAttribute('data-drawer');
     // It slides back down in 240 ms (E) unless motion is reduced (then it just goes).
     const win = doc.defaultView;
     const motion = win?.matchMedia?.('(prefers-reduced-motion: no-preference)').matches === true;
-    if (!motion) { restPull(); panel.hidden = true; return; }
+    if (!motion) { panel.hidden = true; return; }
     panel.setAttribute('data-closing', '');
-    // The tab comes back only once the tray has gone, so it never crosses the tiles on the way.
-    closeTimer = win?.setTimeout(() => { closeTimer = undefined; panel.removeAttribute('data-closing'); if (!isOpen) { panel.hidden = true; restPull(); } }, 240);
+    closeTimer = win?.setTimeout(() => { closeTimer = undefined; panel.removeAttribute('data-closing'); if (!isOpen) panel.hidden = true; }, 240);
   }
   pull.addEventListener('click', () => { if (isOpen) { close(); } else open(); }, { signal });
   // Escape closes from anywhere in the drawer or on the pull, and focus returns to the pull. No trap: Tab is never intercepted.

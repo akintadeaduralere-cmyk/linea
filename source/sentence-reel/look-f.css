@@ -547,9 +547,11 @@
     .sr-look.sr-player .sr-tray-in { background-image: none; border-style: solid; border-width: 0;
       /* A plain url, never image-set(): WebKit (every iPhone browser) slices an image-set() border image against the wrong size, which drew the dial well squashed with a seam under it. */
       border-image-source: url(./assets/tray/p-tray-bare@2x.webp);
-      border-image-slice: 81.5% 2.2% 4.9% 2.2% fill; border-image-repeat: stretch;
+      border-image-slice: 81.5% 2.2% 4.9% 2.2% fill; border-image-repeat: stretch round; /* the brushed band between the slices repeats at its own size down the plate: stretched, its grain smeared and showed a line */
       border-image-width: calc(var(--u) * 191 * 0.815) calc(var(--u) * 430 * 0.022) calc(var(--u) * 191 * 0.049) calc(var(--u) * 430 * 0.022);
       padding-bottom: max(calc(var(--u) * 7), 12px); }
+    /* The flat strip that once covered the old plate's bevel at 191 units has nothing to cover now, and showed as a pale line across the brushed plate. */
+    .sr-look.sr-player .sr-drawer .sr-tray-in::after { content: none; }
   }
 }
 
