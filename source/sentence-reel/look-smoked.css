@@ -1,0 +1,311 @@
+/*
+ * Smoked glass: Linea's second skin (owner decision, 14 Nov 2026). The player carries .sr-smoked instead of .sr-look, so none of the
+ * silver look's rules apply and silver is untouched. Built from the approved render (17-personality/approved-smoked-glass-skin) and the
+ * approved sketches: every position below is the sketch's own number in sketch pixels (1 px = 0.5 mm), turned into CSS through --s.
+ *
+ * The body, glass, machine, key domes, windows, reel band and Settings tab are ONE rendered plate (assets/smoked, from build_v2.py and
+ * build_phone.py with LAYER=plate). Everything that changes is live: the film, the seam, the seek slots and numbers, the caption line,
+ * the time, the key icons and lamps, the volume thumb and lamps, the reel ticks, the NOW index and the hub. Every lit part uses --ember,
+ * so the page's Accent choice works on this skin too.
+ */
+@media (forced-colors: active) { .sr-smoked .sr-standby { display: none; } }
+/* The line-count engraving, the vector ticks and the vector seek slots are smoked glass only. */
+.sr-disc .sr-disc-count, .sr-ticks, .sr-slots { display: none; }
+
+@media not (forced-colors: active) {
+  .sr-smoked {
+    --sr-font-s: 'Avenir Next', 'Avenir', 'SR Window', system-ui, sans-serif;   /* Avenir on Apple systems (as rendered); Saira, Linea's own face, elsewhere */
+    --fl: 12px; --hit: 44px;
+    --sm-white: #f1f3f5; --sm-mute: #8b929c; --sm-icon: #eef1f4; --sm-slot: #6a7079; --sm-tick: #ffffff; --sm-lamp-off: #6e6764; --sm-bead-hi: #b9b5b1; --sm-bead: #94908c; --sm-bead-lo: #5d5957;
+    --sm-ease: cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative; isolation: isolate; padding: 0; background: none; color: var(--sm-white);
+    font-family: var(--sr-font-s); font-weight: 600; -webkit-font-smoothing: antialiased;
+  }
+  .sr-smoked :is(video-player, media-container) { display: contents; }
+  .sr-smoked :is(.sr-controls, .sr-reelwrap, .sr-keys, .sr-timeline) { display: contents; }
+  .sr-smoked .sr-spacer { display: block; aspect-ratio: var(--sm-aspect); }
+  .sr-smoked .sr-art > * { display: none; }
+  .sr-smoked .sr-art > :is(.sr-a-body, .sr-a-now, .sr-a-corners) { display: block; position: absolute; margin: 0; }
+  .sr-smoked .sr-a-body::after, .sr-smoked .sr-a-now::before { content: none; }
+  .sr-smoked .sr-a-now::after { content: ''; position: absolute; left: calc(50% - 0.5px); top: 100%; width: 1px; height: calc(var(--s) * var(--needle)); background: var(--ember); opacity: clamp(0, var(--sr-line, 0), 1); }
+  .sr-smoked :is(.sr-stage, .sr-window, .sr-time, .sr-fader, .sr-reel, .sr-hub, .sr-btn, .sr-volume, .sr-pull) { position: absolute; margin: 0; box-sizing: border-box; }
+
+  /* Placement: a part sets --x --y (top left) --w --h in sketch px, or --cx --cy (centre) and --d (diameter). */
+  .sr-smoked :is(.sr-stage, .sr-window, .sr-time, .sr-fader, .sr-volume, .sr-pull, .sr-a-now, .sr-a-corners) {
+    left: round(calc(var(--ox, 0px) + (var(--x) - var(--bx)) * var(--s)), 1px); top: round(calc(var(--oy, 0px) + (var(--y) - var(--by)) * var(--s)), 1px); width: calc(var(--w) * var(--s)); height: calc(var(--h) * var(--s));
+  }
+  .sr-smoked :is(.sr-btn, .sr-hub, .sr-reel) {
+    left: calc(var(--ox, 0px) + (var(--cx) - var(--bx)) * var(--s)); top: calc(var(--oy, 0px) + (var(--cy) - var(--by)) * var(--s)); translate: -50% -50%;
+    width: max(var(--hit), calc(var(--d) * var(--s))); height: max(var(--hit), calc(var(--d) * var(--s)));
+  }
+
+  /* Back to front: plate, reel ticks, film, live console parts, hub, NOW. */
+  .sr-smoked .sr-a-body { left: var(--ox, 0px); top: var(--oy, 0px); width: calc(var(--bw) * var(--s)); height: calc(var(--bh) * var(--s)); z-index: 1;
+    background: var(--sm-plate) 0 0 / 100% 100% no-repeat; filter: drop-shadow(0 calc(var(--s) * 26) calc(var(--s) * 34) rgb(0 0 0 / 0.42)); }
+  /* The ember light spilling onto the surface under the device, as rendered (warm, soft, in the accent colour). */
+  .sr-smoked .sr-art::before { content: ''; position: absolute; z-index: 0; pointer-events: none; left: calc(var(--ox, 0px) + (230 - var(--bx)) * var(--s)); width: calc(var(--s) * 900); top: calc(var(--oy, 0px) + (850 - var(--by)) * var(--s)); height: calc(var(--s) * 190);
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--ember) 30%, transparent), transparent); }
+  .sr-smoked.sr-player:is(:fullscreen,[data-theatre]) .sr-art::before { content: none; }
+  .sr-smoked .sr-reel { z-index: 5; --disc: 170; --band-in: 150; --band-out: 165; }   /* above the film where it overlaps the screen; tap band in sketch px */
+  .sr-smoked .sr-stage { z-index: 4; }
+  .sr-smoked :is(.sr-window, .sr-time, .sr-fader, .sr-btn, .sr-volume, .sr-pull, .sr-a-corners) { z-index: 5; }
+  .sr-smoked .sr-hub { z-index: 6; } .sr-smoked .sr-a-now { z-index: 6; }
+  .sr-smoked .sr-message { position: absolute; z-index: 8; left: calc(var(--ox, 0px) + (var(--sx) - var(--bx) + 16) * var(--s)); top: calc(var(--oy, 0px) + (var(--sy) - var(--by) + 16) * var(--s)); max-width: 60%; border-radius: 8px; }
+
+  /* Screen: the film sits in the black glass slab; the slab shows through the letterbox, so the stage itself is clear. */
+  .sr-smoked .sr-stage { --x: var(--sx); --y: var(--sy); --w: var(--sw); --h: var(--sh); background: transparent; aspect-ratio: auto; min-height: 0; overflow: visible; border-radius: calc(var(--s) * 12); }
+  /* The reel stands in front of the screen's lower right corner: the film is cut away where the reel's rim lies over it. */
+  .sr-smoked .sr-stage > :is(hls-video, video) { overflow: hidden; mask: radial-gradient(circle at calc((var(--rx) - var(--fx)) * var(--s)) calc((var(--ry) - var(--fy)) * var(--s)), transparent calc(var(--rr) * var(--s)), #000 calc(var(--rr) * var(--s) + 0.5px)); }
+  .sr-smoked .sr-stage > :is(hls-video, video) { position: absolute; left: calc((var(--fx) - var(--sx)) * var(--s)); top: calc((var(--fy) - var(--sy)) * var(--s)); width: calc(var(--fw) * var(--s)); height: calc(var(--fh) * var(--s)); background: transparent; }
+  /* The silver look's marks on the film (title, corners, scale) and its standby graphic are silver's; smoked glass shows the poster. */
+  .sr-smoked .sr-stage :is(.sr-etched, .sr-standby) { display: none; }
+
+  /* The ember seam along the glass joint: lit while the film plays, dimmer when paused. */
+  .sr-smoked .sr-a-corners { --y: calc(var(--seam-y) - 1.2); --h: 2.4; pointer-events: none; border-radius: 99px;
+    background: linear-gradient(180deg, var(--ember-hot), #fff0e6 50%, var(--ember-hot)) 0 0 / calc(var(--seam-hot) * 100%) 100% no-repeat, var(--ember);
+    box-shadow: 0 0 0 1px #05070c, 0 0 calc(var(--s) * 2) color-mix(in srgb, var(--ember) 35%, transparent); }
+
+  /* NOW index: one ember bar at twelve o'clock over the reel. */
+  .sr-smoked .sr-a-now { --w: var(--now-w); --h: var(--now-h); width: round(calc(var(--w) * var(--s)), 2px); font-size: 0; color: transparent; translate: none; background: var(--ember); border-radius: 0;
+    box-shadow: 0 calc(var(--s) * 1) calc(var(--s) * 3) rgb(0 0 0 / 0.35), 0 0 calc(var(--s) * 2.5) color-mix(in srgb, var(--ember) 40%, transparent); pointer-events: none; }
+
+  /* Focus: one ring style for every part. */
+  .sr-smoked :focus-visible { outline: 2px solid #fff; outline-offset: 2px; box-shadow: 0 0 0 4px rgb(0 0 0 / 0.75); }
+
+  /* Caption window: the line number, then the line with its spoken word lit. */
+  .sr-smoked .sr-window { --x: var(--cw-x); --y: var(--cw-y); --w: var(--cw-w); --h: var(--cw-h); display: block; overflow: hidden; background: none; border: 0; border-radius: calc(var(--s) * 11);
+    padding: calc(var(--s) * 22) calc(var(--s) * 29) 0 calc(var(--s) * 16); font-family: var(--sr-font-s); font-weight: 600; font-size: max(var(--fl), calc(var(--s) * 15)); line-height: 1.4; min-height: 0; color: var(--sm-white); }
+  .sr-smoked .sr-window::before { counter-reset: ln var(--sr-line, 0) lns var(--sr-lines, 0); content: 'LINE ' counter(ln, decimal-leading-zero) ' / ' counter(lns) / '';
+    position: absolute; left: calc(var(--s) * 16); top: calc(var(--s) * 9); font-size: calc(var(--s) * 8.2); line-height: 1; letter-spacing: 0.28em; font-weight: 600; color: var(--ember); }
+  .sr-smoked .sr-window:not([data-lines]):not(:has(.sr-word))::before { content: none; }
+  .sr-smoked .sr-sentence { margin: 0; font: inherit; }
+  .sr-smoked .sr-word { color: var(--sm-white); }
+  .sr-smoked .sr-word:not([data-said]):not([data-spoken]) { color: #9aa1ab; }
+  .sr-smoked .sr-word[data-spoken] { color: var(--ember); text-decoration: none; text-shadow: 0 0 0.45em var(--ember-glow); }
+  .sr-smoked .sr-sentence { position: relative; }
+  .sr-smoked .sr-ul { display: block; position: absolute; left: 0; top: 0; width: 1px; height: max(1.5px, calc(var(--s) * 1.6)); margin-top: calc(var(--s) * -4); border-radius: 1px; background: var(--ember); pointer-events: none;
+    box-shadow: 0 0 calc(var(--s) * 3) var(--ember-glow); transform: translate(var(--ul-x, 0px), var(--ul-y, 0px)) scaleX(var(--ul-w, 0)); transform-origin: 0 0; transition: transform 250ms var(--sm-ease), opacity 120ms linear; }
+  .sr-smoked .sr-ul[data-off] { opacity: 0; }
+  .sr-smoked .sr-ul[data-jump] { transition-duration: 0s; }
+  .sr-smoked .sr-window.sr-strip { display: none; }
+
+  /* Time window: TIME, the current time, then OF and the length. */
+  .sr-smoked .sr-time { --x: var(--tw-x); --y: var(--tw-y); --w: var(--tw-w); --h: var(--tw-h); display: block; padding: calc(var(--s) * 22) calc(var(--s) * 14) 0; background: none; border: 0;
+    font-family: var(--sr-font-s); font-variant-numeric: tabular-nums; line-height: 1; color: var(--sm-white); }
+  .sr-smoked .sr-time::before { content: 'TIME' / ''; position: absolute; left: calc(var(--s) * 14); top: calc(var(--s) * 9); font-size: calc(var(--s) * 7.5); letter-spacing: 0.22em; font-weight: 600; color: #e6e9ec; }
+  .sr-smoked .sr-time > time:first-of-type { display: block; margin-top: calc(var(--s) * 6.5); font-size: max(var(--fl), calc(var(--s) * 24)); font-weight: 700; letter-spacing: 0.01em; }
+  .sr-smoked .sr-time > time:last-of-type { display: block; margin-top: calc(var(--s) * 1); font-size: max(10px, calc(var(--s) * 11)); font-weight: 500; color: var(--sm-white); }
+  .sr-smoked .sr-time > time:last-of-type::before { content: 'OF ' / ''; }
+  .sr-smoked .sr-time .sr-slash { display: none; }
+  .sr-smoked .sr-time-toggle { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: 0; padding: 0; }
+  .sr-smoked .sr-time-toggle:focus-visible { opacity: 1; background: transparent; color: transparent; border-radius: calc(var(--s) * 11); }
+
+  /* Seek: one slot per spoken line in the machined channel, played slots lit, every tenth numbered below. */
+  .sr-smoked .sr-fader { --x: calc(var(--sk-x) + 10); --y: calc(var(--sk-y) - 6); --w: calc(var(--sk-w) - 14); --h: calc(var(--sk-h) + 12); display: block; padding: 0; min-height: 0; background: none; border: 0; cursor: pointer; touch-action: pan-y; }
+  .sr-smoked .sr-rider, .sr-smoked .sr-fader::before { display: none; }
+  .sr-smoked .sr-cells { position: absolute; left: 0; right: 0; top: 50%; height: calc(var(--s) * 14); translate: 0 -50%; display: flex; gap: 0; counter-reset: cell; }
+  .sr-smoked .sr-cell, .sr-smoked .sr-cell:is([data-played], [data-current]) { position: relative; height: 100%; background: none; box-shadow: none; border-radius: 0; min-width: 0; counter-increment: cell; flex: 1 1 0 !important; }   /* evenly spaced: one slot per line, as rendered */
+  .sr-smoked .sr-cell::before { content: none; }
+  .sr-smoked .sr-fader .sr-slots { display: block; position: absolute; left: 0; top: 50%; translate: 0 -50%; overflow: visible; pointer-events: none; }
+  .sr-smoked .sr-sl-edge { fill: #12151a; } .sr-smoked .sr-sl-off { fill: var(--sm-slot); } .sr-smoked .sr-sl-hi { fill: rgb(255 255 255 / 0.28); }
+  .sr-smoked .sr-sl-lit { fill: var(--ember); filter: drop-shadow(0 0 1px color-mix(in srgb, var(--ember) 45%, transparent)); }
+  .sr-smoked .sr-cell::after { content: none; }
+  .sr-smoked .sr-cell:nth-child(10n + 1)::after { content: counter(cell, decimal-leading-zero) / ''; position: absolute; left: calc(var(--s) * var(--slot-w) / 2);
+    top: calc(50% + var(--s) * 20.7); translate: -50% -50%; font-size: calc(var(--s) * 5.5); letter-spacing: 0.08em; font-weight: 600; color: #9aa0a8; }
+
+  /* Keys: the dome and its ring are in the plate; the icon and the lamp are live, so Mute and Full screen can change. */
+  .sr-smoked :is(.sr-btn, .sr-hub) { min-width: 0; min-height: 0; }   /* the hit size comes from the placement rule: square, so focus rings are round */
+  .sr-smoked .sr-btn { --d: 48; padding: 0; border: 0; border-radius: 50%; background: none; color: transparent; font-size: 0; cursor: pointer; }
+  .sr-smoked .sr-btn::after { content: ''; position: absolute; left: 50%; top: 50%; width: calc(var(--s) * 24); height: calc(var(--s) * 24); translate: -50% -50%;
+    background: var(--sm-icon); mask: var(--ic) center / 100% 100% no-repeat; transition: translate 90ms linear; margin-top: -0.6px; }
+  .sr-smoked .sr-btn:active::after { translate: -50% calc(-50% + 0.6px); }
+  .sr-smoked .sr-btn:active { background: radial-gradient(circle, rgb(0 0 0 / 0.32) 0 calc(var(--s) * 18), transparent calc(var(--s) * 19)); }
+  @media (hover: hover) { .sr-smoked :is(.sr-btn, .sr-hub, .sr-pull, .sr-output):hover { filter: brightness(1.18); } .sr-smoked .sr-btn:hover { background: radial-gradient(circle, rgb(255 255 255 / 0.06) 0 calc(var(--s) * 18), transparent calc(var(--s) * 19)); } }
+  .sr-smoked .sr-btn[aria-disabled="true"] { opacity: 0.45; cursor: default; }
+  .sr-smoked :is(.sr-btn, .sr-hub):focus-visible { outline-offset: -3px; }
+  .sr-smoked :is(.sr-words, .sr-wait)::before { content: ''; position: absolute; left: 50%; top: calc(50% - var(--s) * 22.6); width: calc(var(--s) * 3.8); height: calc(var(--s) * 3.8); translate: -50% -50%; border-radius: 50%;
+    background: var(--sm-lamp-off); transition: background-color 180ms linear, box-shadow 180ms linear; }
+  .sr-smoked :is(.sr-words[aria-pressed="true"], .sr-wait[aria-checked="true"])::before { background: var(--ember); box-shadow: 0 0 calc(var(--s) * 2.5) color-mix(in srgb, var(--ember) 45%, transparent); }
+  .sr-smoked .sr-again { --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-12 -12 24 24' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M-6 -6 A8 8 0 1 0 0 -8 M-4 -12 L0 -8 L-4 -4'/%3E%3C/svg%3E"); }
+  .sr-smoked .sr-next { --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-12 -12 24 24' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M-6 -7 L3 0 L-6 7Z M6 -7 L6 7'/%3E%3C/svg%3E"); }
+  .sr-smoked .sr-words { --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-12 -12 24 24' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M-9 -6 h18 v12 h-18z M-5 -1 h6 M-5 3 h10'/%3E%3C/svg%3E"); }
+  .sr-smoked .sr-wait { --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-12 -12 24 24' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M-8 0 a8 8 0 1 0 16 0 a8 8 0 1 0 -16 0 M0 0 L5 -6'/%3E%3C/svg%3E"); }
+  .sr-smoked .sr-full { --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-12 -12 24 24' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M-9 -4 v-5 h5 M4 -9 h5 v5 M9 4 v5 h-5 M-4 9 h-5 v-5'/%3E%3C/svg%3E"); }
+  .sr-smoked .sr-full[aria-pressed="true"] { --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-12 -12 24 24' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M-4 -9 v5 h-5 M9 -4 h-5 v-5 M4 9 v-5 h5 M-9 4 h5 v5'/%3E%3C/svg%3E"); }
+  .sr-smoked .sr-sound { --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-12 -12 24 24' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M-8 -3 h4 l6 -5 v16 l-6 -5 h-4z M6 -4 q4 4 0 8'/%3E%3C/svg%3E"); }
+  .sr-smoked .sr-sound[aria-pressed="true"] { --ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-12 -12 24 24' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M-8 -3 h4 l6 -5 v16 l-6 -5 h-4z M5 -3 l6 6 M11 -3 l-6 6'/%3E%3C/svg%3E"); }
+
+  /* Volume: a knurled thumb in its slot (rendered sprite, moved by the level) and five lamps. */
+  .sr-smoked .sr-volume { --x: var(--vo-x); --y: var(--vo-y); --w: 36; --h: 58; display: block; padding: 0; min-width: 0; min-height: 0; border: 0; border-radius: 0; background: none; cursor: pointer; touch-action: pan-y; }
+  .sr-smoked .sr-volume[hidden], .sr-smoked[data-volume-readonly] .sr-volume { display: none !important; }
+  .sr-smoked .sr-volume > :not(.sr-lv-house) { display: none; }
+  .sr-smoked .sr-lv-house { display: block; position: absolute; left: calc(var(--s) * 0.6); width: calc(var(--s) * 20.8); height: calc(var(--s) * 13.7); pointer-events: none;
+    top: calc(var(--s) * (4 + (5 - var(--sr-level, 5)) * 7.26)); background: var(--sm-thumb) 0 0 / 100% 100% no-repeat; transition: top 160ms var(--sm-ease); }
+  /* Five lamps: the unlit row underneath, the lit ones over it from the bottom up to the level. */
+  .sr-smoked .sr-volume::before, .sr-smoked .sr-volume::after { content: ''; position: absolute; left: calc(var(--s) * 28.1); bottom: calc(var(--s) * 8.1); width: calc(var(--s) * 3.8); height: calc(var(--s) * 50); pointer-events: none;
+    background: radial-gradient(circle at 38% 45%, rgb(255 255 255 / 0.85) 0, transparent calc(var(--s) * 1.1)) 0 100% / 100% calc(var(--s) * 10) repeat-y,
+      radial-gradient(circle closest-side, var(--sm-bead-hi) 0, var(--sm-bead) 62%, var(--sm-bead-lo) 86%, transparent 94%) 0 100% / 100% calc(var(--s) * 10) repeat-y; }
+  /* Unlit beads are light-grey glass with a small highlight, as in the approved render (14 Nov: chosen over flat dark dots). */
+  .sr-smoked .sr-volume::after { height: calc(var(--s) * 10 * var(--sr-level, 5)); background-image: radial-gradient(circle closest-side, var(--ember) 90%, transparent); }
+
+  /* Hub: the black glass and its turned rim are in the plate; the ember ring, the play or pause mark and the word are live. */
+  .sr-smoked .sr-hub { --d: calc(121 * var(--rk)); padding: 0; border: 0; border-radius: 50%; background: var(--hub-ic) center / calc(var(--s) * var(--rk) * 127) calc(var(--s) * var(--rk) * 127) no-repeat; color: transparent; font-size: 0; cursor: pointer;
+    --hub-ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-63.5 -63.5 127 127'%3E%3Cpath fill='%23f1f3f5' d='M-9 -16 h6.5 v25 h-6.5z M2.5 -16 h6.5 v25 h-6.5z'/%3E%3C/svg%3E"); }
+  .sr-smoked .sr-hub[data-paused="true"] { --hub-ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-63.5 -63.5 127 127'%3E%3Cpath fill='%23f1f3f5' d='M-9 -17 L15 -3 L-9 11Z'/%3E%3C/svg%3E"); }
+  .sr-smoked .sr-hub::before { content: ''; position: absolute; left: 50%; top: 50%; width: calc(var(--s) * var(--rk) * 99); height: calc(var(--s) * var(--rk) * 99); translate: -50% -50%; box-sizing: border-box; border-radius: 50%;
+    border: calc(var(--s) * var(--hub-rw)) solid var(--ember); box-shadow: 0 0 0 var(--hub-ln) #05070c, inset 0 0 0 var(--hub-ln) #05070c, 0 0 calc(var(--s) * var(--rk) * 2) color-mix(in srgb, var(--ember) 25%, transparent); pointer-events: none; }
+  .sr-smoked .sr-hub[aria-busy="true"]::before { border-style: dashed; animation: sr-turn 1.4s linear infinite; }
+  .sr-smoked .sr-hub::after { content: attr(data-label) / ''; position: absolute; left: 50%; top: calc(50% + var(--s) * var(--hub-ly)); translate: -50% -50%; text-transform: uppercase;
+    font-size: calc(var(--s) * var(--hub-lf)); letter-spacing: 0.14em; font-weight: 700; color: #f1f3f5; white-space: nowrap; }
+
+  /* Reel: the disc is the slider. One fine tick per spoken line on the glass (every fifth longer), the played ones lit; the ring turns one notch
+     per line so the current line stands under the NOW index, where a wider lit tick marks it. The line count is engraved over the band. */
+  .sr-smoked .sr-reel { --d: calc(340 * var(--rk)); border: 0; border-radius: 50%; padding: 0; background: none; display: block; min-width: 0; min-height: 0; cursor: grab; touch-action: none; }
+  .sr-smoked .sr-reel:active { cursor: grabbing; }
+  .sr-smoked .sr-reel :is(.sr-ring, .sr-fine, .sr-beads) { display: none; }
+  .sr-smoked .sr-reel::before, .sr-smoked .sr-reel::after { content: none; }
+  .sr-smoked .sr-notches { display: none; }
+  .sr-smoked .sr-reel .sr-ticks { display: block; position: absolute; left: 50%; top: 50%; width: calc(var(--s) * var(--rk) * 340); height: calc(var(--s) * var(--rk) * 340); translate: -50% -50%; overflow: visible; pointer-events: none;
+    rotate: calc(max(0, var(--sr-line, 1) - 1) * 360deg / max(1, var(--sr-lines, 86))); transition: rotate 420ms var(--sm-ease); }   /* turns clockwise as the film plays */
+  .sr-smoked .sr-tk-all { fill: none; stroke: var(--sm-tick); stroke-width: 1.15; stroke-linecap: butt; }
+  .sr-smoked .sr-tk-now { display: none; }
+  .sr-smoked .sr-tk-lit { fill: none; stroke: var(--ember); stroke-width: 1.3; stroke-linecap: butt; filter: drop-shadow(0 0 1px color-mix(in srgb, var(--ember) 45%, transparent)); }
+  .sr-smoked .sr-reel[aria-disabled="true"] .sr-ticks { opacity: 0.6; }
+  .sr-smoked .sr-reel:focus-visible { outline-offset: calc(var(--s) * -4); }
+  .sr-smoked .sr-reel .sr-disc { display: block; position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; --disc: 170; --arc-count-r: 123; --arc-count-cap: 5.5; }
+  .sr-smoked .sr-disc :is(.sr-disc-name, .sr-disc-title, .sr-disc-generic) { display: none; }
+  .sr-smoked .sr-disc .sr-disc-count { display: inline; fill: #2c3138; font-family: var(--sr-font-s); font-weight: 600; letter-spacing: 0.36em; }
+
+  /* Settings: the pull tab under the body (rendered); the button lies over it. */
+  .sr-smoked .sr-pull { --x: var(--pl-x); --y: var(--pl-y); --w: 112; --h: 26; min-height: 0; padding: 0; border: 0; background: none; color: transparent; font-size: 0; cursor: pointer; border-radius: 0 0 calc(var(--s) * 12) calc(var(--s) * 12); }
+
+  .sr-smoked :is(.sr-pull, .sr-fader)::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: max(100%, var(--hit)); translate: 0 -50%; }
+  /* Picture-in-picture, AirPlay, Cast: glass keys at the top right of the screen (tiles in the plate, icons live). */
+  .sr-smoked .sr-stage > .sr-outs { position: absolute; z-index: 2; inset: calc((var(--outs-y) - var(--sy)) * var(--s)) calc((var(--sx) + var(--sw) - var(--outs-r)) * var(--s)) auto auto; width: auto; height: auto; display: flex; gap: calc(var(--s) * var(--outs-gap)); overflow: visible; }
+  .sr-smoked .sr-output::after { content: ''; position: absolute; left: 50%; top: 50%; width: calc(var(--s) * var(--outs-hit)); height: max(100%, var(--hit)); translate: -50% -50%; }
+  .sr-smoked .sr-output { width: calc(var(--s) * 32); height: calc(var(--s) * 26); min-width: 0; min-height: 0; padding: 0; border: 0; background: none; border-radius: calc(var(--s) * 7); color: transparent; }
+  .sr-smoked .sr-vh { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+  .sr-smoked .sr-output { position: relative; cursor: pointer; }
+  .sr-smoked .sr-output .sr-ic { display: block; width: calc(var(--s) * 24); height: calc(var(--s) * 24); margin: auto; background: #fff;
+    mask: var(--oic) center / 100% 100% no-repeat; }
+  .sr-smoked .sr-output[aria-disabled="true"] { opacity: 0.4; cursor: default; }
+  .sr-smoked .sr-output[aria-pressed="true"] .sr-ic { background: var(--ember); }
+  .sr-smoked .sr-output[data-output="pip"] { --oic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-12 -12 24 24' fill='none' stroke='white' stroke-width='1.4' stroke-linejoin='round'%3E%3Cpath d='M-9 -7 h18 v14 h-18z M0.5 0 h5.5 v4 h-5.5z'/%3E%3C/svg%3E"); }
+  .sr-smoked .sr-output[data-output="airplay"] .sr-ic { translate: 0 0.9px; }
+  .sr-smoked .sr-output[data-output="cast"] .sr-ic { translate: 0 1.5px; }
+  .sr-smoked .sr-output[data-output="airplay"] { --oic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-12 -12 24 24' fill='none' stroke='white' stroke-width='1.4' stroke-linejoin='round'%3E%3Cpath d='M-9 -7 h18 v11 h-5 M-4 4 h-5 v-11 M-5 9 l5 -6 l5 6z'/%3E%3C/svg%3E"); }
+  .sr-smoked .sr-output[data-output="cast"] { --oic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-12 -12 24 24' fill='none' stroke='white' stroke-width='1.4' stroke-linejoin='round'%3E%3Cpath d='M-9 -4 v-3 h18 v14 h-7 M-9 0 a8 8 0 0 1 8 8 M-9 4 a4 4 0 0 1 4 4'/%3E%3C/svg%3E"); }
+
+  /* Settings tray: a smoked-glass panel that slides up over the console from the tab. Speed is a black-glass dial in a turned ring with an ember
+     pointer; Language and Quality are display-glass tiles, the chosen one lit by an ember lamp. */
+  .sr-smoked .sr-drawer { position: absolute; z-index: 9; box-sizing: border-box; overflow: hidden; left: calc(var(--ox, 0px) + (var(--tr-x) - var(--bx)) * var(--s)); top: calc(var(--oy, 0px) + (var(--tr-y) - var(--by)) * var(--s));
+    width: calc(var(--tr-w) * var(--s)); height: calc(var(--tr-h) * var(--s)); border-radius: calc(var(--s) * 14); color: #c3c9d1; font-family: var(--sr-font-s); }
+  .sr-smoked .sr-drawer[hidden] { display: none; }
+  .sr-smoked .sr-tray-in { position: absolute; inset: 0; display: grid; grid-template-columns: calc(var(--s) * 150) 1fr; align-items: center; box-sizing: border-box; padding: calc(var(--s) * 10) calc(var(--s) * 16) calc(var(--s) * 10) 0;
+    background: linear-gradient(180deg, #181c23, #080a0d); border: 1px solid rgb(255 255 255 / 0.09); border-radius: inherit;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.10), 0 calc(var(--s) * 10) calc(var(--s) * 24) rgb(0 0 0 / 0.5); animation: sm-tray-in 420ms var(--sm-ease); }
+  .sr-smoked .sr-drawer[data-closing] .sr-tray-in { animation: sm-tray-out 220ms var(--sm-ease) forwards; }
+  @keyframes sm-tray-in { from { transform: translateY(104%); } to { transform: none; } }
+  @keyframes sm-tray-out { to { transform: translateY(104%); } }
+  .sr-smoked .sr-group { display: block; position: relative; }
+  .sr-smoked .sr-group[hidden] { display: none; }
+  .sr-smoked .sr-group-label { display: block; font-size: max(10px, calc(var(--s) * 7.5)); font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--sm-mute); line-height: 1; }
+  /* Speed */
+  .sr-smoked .sr-group[data-group="speed"] { width: calc(var(--s) * 150); height: calc(var(--s) * 136); }
+  .sr-smoked .sr-group[data-group="speed"] .sr-group-label { position: absolute; left: 50%; bottom: 0; translate: -50% 0; }
+  .sr-smoked .sr-tray-knob { position: absolute; left: calc(var(--s) * 75); top: calc(var(--s) * 62); width: calc(var(--s) * 60); height: calc(var(--s) * 60); translate: -50% -50%; border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle at 38% 30%, #2c323b, #0d1014 55%, #050608) padding-box, conic-gradient(from 210deg, #e4e8ec, #8d939c, #d7dce2, #5d636c, #e4e8ec) border-box;
+    border: calc(var(--s) * 5) solid transparent; box-shadow: 0 calc(var(--s) * 2) calc(var(--s) * 6) rgb(0 0 0 / 0.6); }
+  .sr-smoked .sr-tray-knob::after { content: ''; position: absolute; left: 50%; top: 50%; width: calc(var(--s) * 2.2); height: calc(var(--s) * 20); translate: -50% -100%; transform-origin: 50% 100%;
+    rotate: calc(90deg - var(--detent-deg, 90deg)); background: var(--ember); border-radius: 2px; box-shadow: 0 0 calc(var(--s) * 3) var(--ember-glow); transition: rotate 260ms var(--sm-ease); }
+  .sr-smoked .sr-detent { position: absolute; translate: -50% -50%; font-size: max(10px, calc(var(--s) * 7.5)); font-weight: 600; color: var(--sm-mute); line-height: 1; }
+  .sr-smoked .sr-detent[data-rate="0.5"] { left: calc(var(--s) * 36); top: calc(var(--s) * 23); }
+  .sr-smoked .sr-detent[data-rate="1"] { left: calc(var(--s) * 75); top: calc(var(--s) * 7); }
+  .sr-smoked .sr-detent[data-rate="1.25"] { left: calc(var(--s) * 114); top: calc(var(--s) * 23); }
+  .sr-smoked .sr-detent[data-rate="1.5"] { left: calc(var(--s) * 130); top: calc(var(--s) * 62); }
+  .sr-smoked .sr-detent[data-rate="2"] { left: calc(var(--s) * 114); top: calc(var(--s) * 101); }
+  .sr-smoked .sr-dial { position: absolute; left: calc(var(--s) * 75); top: calc(var(--s) * 62); width: max(44px, calc(var(--s) * 60)); height: max(44px, calc(var(--s) * 60)); translate: -50% -50%; border-radius: 50%;
+    display: grid; place-items: center; font-size: max(10px, calc(var(--s) * 10)); font-weight: 700; color: var(--sm-white); cursor: pointer; touch-action: none; padding-top: calc(var(--s) * 16); box-sizing: border-box; }
+  .sr-smoked .sr-dial-down, .sr-smoked .sr-dial-up { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  /* Tiles */
+  .sr-smoked .sr-tiles { display: grid; gap: calc(var(--s) * 12); align-content: center; }
+  .sr-smoked .sr-tiles .sr-group-label { margin-bottom: calc(var(--s) * 6); }
+  .sr-smoked :is(.sr-radios, .sr-outputs) { display: flex; flex-wrap: wrap; gap: calc(var(--s) * 6); }
+  .sr-smoked .sr-drawer :is(.sr-radio, .sr-output) { position: relative; min-width: max(44px, calc(var(--s) * 46)); min-height: max(32px, calc(var(--s) * 30)); width: auto; height: auto; padding: 0 calc(var(--s) * 8);
+    border: 1px solid rgb(255 255 255 / 0.07); border-radius: calc(var(--s) * 8); background: linear-gradient(180deg, #0b0e12, #040507); color: #aab0b9;
+    font-family: var(--sr-font-s); font-size: max(var(--fl), calc(var(--s) * 9)); font-weight: 600; letter-spacing: 0.08em; cursor: pointer; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05); }
+  .sr-smoked .sr-drawer :is(.sr-radio, .sr-output)::before { content: ''; position: absolute; left: calc(var(--s) * 5); top: calc(var(--s) * 5); width: max(4px, calc(var(--s) * 3.8)); height: max(4px, calc(var(--s) * 3.8)); border-radius: 50%; background: var(--sm-lamp-off); }
+  .sr-smoked .sr-drawer .sr-radio[aria-checked="true"] { color: var(--sm-white); border-color: rgb(255 255 255 / 0.14); }
+  .sr-smoked .sr-drawer .sr-radio[aria-checked="true"]::before { background: var(--ember); box-shadow: 0 0 calc(var(--s) * 3) var(--ember-glow); }
+  .sr-smoked .sr-drawer .sr-output .sr-q-name { display: none; }
+
+  /* Full screen (and the theatre fallback): the film fills the screen; the console (the device below the screen, with the reel) is docked on the
+     bottom edge at the largest size that fits; the screen keys move to the top right. When idle, the console fades and the line shows as a strip. */
+  .sr-smoked.sr-player:is(:fullscreen,[data-theatre]) { display: block; padding: 0; background: #000; container-type: size; }
+  .sr-smoked.sr-player:is(:fullscreen,[data-theatre]) .sr-spacer { display: none; }
+  .sr-smoked.sr-player:is(:fullscreen,[data-theatre]) > * { --s: min(100cqw / var(--bw), 100cqh / var(--bh)); --ox: calc((100cqw - var(--bw) * var(--s)) / 2); --oy: calc(100cqh - var(--bh) * var(--s)); }
+  .sr-smoked.sr-player:is(:fullscreen,[data-theatre]) .sr-stage { left: 0; top: 0; width: 100%; height: 100%; border-radius: 0; z-index: 0; mask: none; background: #000; }
+  .sr-smoked.sr-player:is(:fullscreen,[data-theatre]) .sr-stage > :is(hls-video, video) { left: 0; top: 0; width: 100%; height: 100%; mask: none; }
+  .sr-smoked.sr-player:is(:fullscreen,[data-theatre]) .sr-a-body { filter: none;
+    mask: linear-gradient(transparent calc((var(--dock-y) - var(--by)) * var(--s)), #000 0), radial-gradient(circle at calc((var(--rx) - var(--bx)) * var(--s)) calc((var(--ry) - var(--by)) * var(--s)), #000 calc(var(--rr-fs) * var(--s)), transparent calc(var(--rr-fs) * var(--s) + 0.5px)); }
+  .sr-smoked.sr-player:is(:fullscreen,[data-theatre]) .sr-stage > .sr-outs { inset: 16px 16px auto auto; gap: 8px; }
+  .sr-smoked.sr-player:is(:fullscreen,[data-theatre]) .sr-output { width: 44px; height: 38px; background: rgb(10 12 16 / 0.72); border: 1px solid rgb(255 255 255 / 0.12); border-radius: 9px; }
+  .sr-smoked.sr-player:is(:fullscreen,[data-theatre]) .sr-output .sr-ic { width: 22px; height: 22px; }
+  .sr-smoked.sr-player:is(:fullscreen,[data-theatre])[data-idle] > .sr-pull { opacity: 0; pointer-events: none; }
+  .sr-smoked.sr-player[data-idle][data-strip] .sr-window.sr-strip:not([data-quiet]) { display: block; position: fixed; z-index: 11; left: 50%; bottom: 6%; top: auto; transform: translate(-50%); translate: none; width: min(86%, 1100px); height: auto; min-height: 0;
+    padding: 0.45em 0.9em 0.55em; border-radius: 14px; background: rgb(8 10 13 / 0.86); border: 1px solid rgb(255 255 255 / 0.10); text-align: center; pointer-events: none;
+    font-size: clamp(16px, 2.4vw, 36px); line-height: 1.35; overflow: visible; }
+  .sr-smoked.sr-player[data-idle][data-strip] .sr-window.sr-strip::before { content: none; }
+
+  /* ---------------- Desktop: box 128..1190 x 205..962 of sketch v5 (approved render), 1062 x 757 ---------------- */
+  @container reel (min-width: 760px) {
+    .sr-smoked > *, .sr-smoked { --bx: 128; --by: 205; --bh: 757; --bw: 1062; --dock-y: 668; --s: calc(100cqw / 1062); --sm-aspect: 1062 / 777;
+      --sm-plate: image-set(url(./assets/smoked/s-desktop-plate@1x.avif) type("image/avif") 1x, url(./assets/smoked/s-desktop-plate@2x.avif) type("image/avif") 2x, url(./assets/smoked/s-desktop-plate@2x.webp) type("image/webp") 2x);
+      --sm-thumb: image-set(url(./assets/smoked/s-desktop-thumb@1x.avif) type("image/avif") 1x, url(./assets/smoked/s-desktop-thumb@2x.avif) type("image/avif") 2x, url(./assets/smoked/s-desktop-thumb@2x.webp) type("image/webp") 2x);
+      --sx: 166; --sy: 240; --sw: 848; --sh: 422; --outs-r: 1010; --outs-y: 245; --outs-gap: 4; --outs-hit: 36; --rx: 1000; --ry: 772; --rr: 182; --rr-fs: 183;
+      --seam-y: 674; --seam-hot: 0.229; --fx: 178; --fy: 282; --fw: 824; --fh: 346;
+      --sk-x: 178; --sk-y: 684; --sk-w: 626; --sk-h: 22; --slot-w: 3.4; --fsk: 612;
+      --cw-x: 176; --cw-y: 724; --cw-w: 352; --cw-h: 70; --tw-x: 542; --tw-y: 724; --tw-w: 122; --tw-h: 70;
+      --vo-x: 584; --vo-y: 800; --pl-x: 404; --pl-y: 878; --now-w: 6; --now-h: 26; --needle: 14; --rk: 1; --hub-rw: 3.8; --hub-ly: 27; --hub-lf: 9; --hub-ln: 1px; --tr-x: 168; --tr-y: 720; --tr-w: 552; --tr-h: 162; }
+    .sr-smoked .sr-a-corners { --x: 182; --w: 646; }
+    .sr-smoked .sr-a-now { --x: 997; --y: 582; }
+    .sr-smoked .sr-again { --cx: 205; --cy: 828; } .sr-smoked .sr-next { --cx: 268; --cy: 828; } .sr-smoked .sr-words { --cx: 331; --cy: 828; }
+    .sr-smoked .sr-wait { --cx: 394; --cy: 828; } .sr-smoked .sr-full { --cx: 468; --cy: 828; } .sr-smoked .sr-sound { --cx: 540; --cy: 828; }
+    .sr-smoked .sr-hub, .sr-smoked .sr-reel { --cx: 1000; --cy: 772; }
+  }
+
+  /* ---------------- Phone: box 112..628 x 100..1090 of the approved phone sketch v1, 516 x 990; the reel is 0.72 of the desktop reel ---------------- */
+  @container reel (max-width: 759.98px) {
+    .sr-smoked > *, .sr-smoked { --bx: 112; --by: 100; --bh: 990; --bw: 516; --dock-y: 392; --s: calc(100cqw / 516); --sm-aspect: 516 / 1006;
+      --sm-plate: image-set(url(./assets/smoked/s-phone-plate@1x.avif) type("image/avif") 1x, url(./assets/smoked/s-phone-plate@2x.avif) type("image/avif") 2x, url(./assets/smoked/s-phone-plate@2x.webp) type("image/webp") 2x);
+      --sx: 146; --sy: 136; --sw: 448; --sh: 250; --outs-r: 598; --outs-y: 139; --outs-gap: 14; --outs-hit: 46; --rx: 370; --ry: 788; --rr: 0; --rr-fs: 132;
+      --seam-y: 402; --seam-hot: 0.227; --fx: 150; --fy: 170; --fw: 440; --fh: 184;
+      --sk-x: 148; --sk-y: 412; --sk-w: 444; --sk-h: 22; --slot-w: 2.6; --fsk: 430;
+      --cw-x: 150; --cw-y: 456; --cw-w: 440; --cw-h: 74; --tw-x: 309; --tw-y: 544; --tw-w: 122; --tw-h: 74;
+      --pl-x: 314; --pl-y: 1058; --now-w: 5; --now-h: 20; --needle: 10; --rk: 0.72; --hub-rw: 2.4; --hub-ly: 21; --hub-lf: 7.5; --hub-ln: 0px; --tr-x: 140; --tr-y: 450; --tr-w: 460; --tr-h: 420; }
+    .sr-smoked .sr-a-corners { --x: 150; --w: 440; }
+    .sr-smoked .sr-a-now { --x: 367.5; --y: 642; }
+    .sr-smoked .sr-again { --cx: 196; --cy: 788; } .sr-smoked .sr-next { --cx: 544; --cy: 788; }
+    .sr-smoked .sr-words { --cx: 205; --cy: 1000; } .sr-smoked .sr-wait { --cx: 315; --cy: 1000; } .sr-smoked .sr-full { --cx: 425; --cy: 1000; } .sr-smoked .sr-sound { --cx: 535; --cy: 1000; }
+    .sr-smoked .sr-hub, .sr-smoked .sr-reel { --cx: 370; --cy: 788; }
+    /* The tray on a phone: the dial on top, the tiles under it (the same order as for the keyboard). */
+    .sr-smoked .sr-tray-in { grid-template-columns: 1fr; grid-template-rows: auto auto; justify-items: center; align-content: center; padding: calc(var(--s) * 12) calc(var(--s) * 16); row-gap: calc(var(--s) * 10); }
+    .sr-smoked .sr-tiles { justify-self: center; justify-items: start; }
+    /* As on the silver phone: no volume control (a phone web page cannot set the volume); Mute stays. */
+    .sr-smoked .sr-volume { display: none !important; }
+    .sr-smoked .sr-disc .sr-disc-count { display: none; }   /* not on the approved phone sketch */
+  }
+}
+
+/* Behaviour shared with silver (14 Nov 2026, owner: a finished line stayed on the smoked screen). Between lines and before the
+   first line the window clears, as subtitles do; a cast or a failed film hides the picture behind the message. */
+.sr-smoked .sr-window[data-between] > * { opacity: 0; }
+.sr-smoked[data-phase="error"] .sr-stage :is(video, mux-video, video-player, media-container), .sr-smoked[data-remote] .sr-stage :is(video, mux-video, video-player, media-container) { visibility: hidden; }
+/* Long lines turn pages, as on silver (14 Nov 2026: the spoken word ran out of the smoked window on the longest line).
+   The text face is the window below the LINE label (top padding 22); the window code measures it from min-height and pages
+   by whole lines. The sentence slides up by the page and is clipped to the page's lines, so no line above or below shows. */
+.sr-smoked .sr-window:not(.sr-strip) { min-height: calc(var(--s) * (var(--h) - 22)); }
+.sr-smoked .sr-window:not(.sr-strip) .sr-sentence { --pg: calc(var(--sr-page, 0) * var(--sr-page-lines, 2) * 1.4em); transform: translateY(calc(var(--pg) * -1)); }
+.sr-smoked .sr-window[data-paged]:not(.sr-strip) .sr-sentence { clip-path: inset(var(--pg) -2em max(0px, calc(100% - var(--pg) - var(--sr-page-lines, 2) * 1.4em)) -2em); }
+/* Full screen: between lines the caption strip goes away entirely, backing and all. */
+.sr-smoked.sr-player[data-idle][data-strip] .sr-window.sr-strip[data-between] { visibility: hidden; }
