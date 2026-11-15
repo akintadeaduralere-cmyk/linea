@@ -226,6 +226,9 @@
   }
   /* Paged: one page tall (the face's own height), the text starts after the slack so no sliver of the next line shows under the last one. */
   .sr-look .sr-window[data-paged] { align-items: flex-start; padding-top: max(0px, calc(var(--sr-slack, 0px) - 2px)); max-height: calc(var(--sr-face, 0px) + 2 * var(--bz-y, 0px)); overflow: hidden; }
+  /* Paged, from the second page on: the rows already read are cut exactly at the page's top line. Without this the tails of the row above
+     (g, y, p, commas) showed in the padding over the first visible row. Page 0 is not cut (the -1em), so tall first-row letters keep their tops. */
+  .sr-look .sr-window[data-paged] .sr-sentence { clip-path: inset(calc(var(--sr-page, 0) * var(--lh) * var(--sr-page-lines, 3) - (1 - min(1, var(--sr-page, 0))) * 1em) -2em -1em -2em); }
   /* The full screen caption strip: the same window (face, colours, word lighting) at a size set by the screen, centred low on the picture. Shown by the rule in reel.css. */
   .sr-look .sr-window.sr-strip { display: none; }
   .sr-look.sr-player[data-idle][data-strip] .sr-window.sr-strip:not([data-quiet]) {
