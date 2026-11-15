@@ -115,7 +115,13 @@ export class CompleteCaptions {
       // A complete file was named: follow the viewer to the same film's file in the chosen language (its <track> element), if the page has one.
       const els = Array.from(this.media.querySelectorAll?.('track') ?? []) as HTMLTrackElement[];
       const el = els.find((t) => t.track && t.track.language === track.language && t.track.label === track.label);
-      if (el?.src && el.src !== this.options.sentencesSrc) this.reset(el.src);
+      if (!el?.src || el.src === this.options.sentencesSrc) return;
+      // The list had begun to load, so the viewer's intent is already given: load the chosen language now. reset() alone goes back
+      // to waiting for a new play, press or focus, which left the window on the title (no sentences) until the next press in the player.
+      const begun = this.phase === 'pending' || this.phase === 'done' || this.phase === 'failed';
+      this.reset(el.src);
+      const fetchNow = this.options.fetchFn ?? (typeof fetch === 'function' ? fetch.bind(globalThis) : undefined);
+      if (begun && this.resting && fetchNow) this.begin(this.media.currentSrc || this.media.src || '', fetchNow, undefined);
       return;
     }
     if (this.phase !== 'done' && this.phase !== 'pending') return;
