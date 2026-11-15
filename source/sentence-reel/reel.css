@@ -234,3 +234,6 @@
    cannot be read at all (data-etched="off" on the player), the mark is hidden. Opacity only. */
 .sr-etched [data-ink] { transition: opacity 180ms cubic-bezier(0.16, 1, 0.3, 1); }
 .sr-etched [data-ink="none"], .sr-player[data-etched="off"] .sr-etched [data-ink] { opacity: 0; pointer-events: none; }
+
+/* Touch: the browser's own tap flash (a blue or grey rectangle over round keys on phones) is off; every control has its own pressed state. */
+.sr-player, .sr-player * { -webkit-tap-highlight-color: transparent; }
