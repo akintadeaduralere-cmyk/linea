@@ -9,6 +9,7 @@ import { createCueGuard } from './cue-guard.ts';
 import { reactToMedia } from './media-reactions.ts';
 import { Emitter } from './emitter.ts';
 import { FrameLoop } from './frame-loop.ts';
+import { GapSkip } from './gap-skip.ts';
 import { fullscreenElementOf, toggleFullscreenOrRefuse } from './fullscreen.ts';
 import { atEnd } from './state.ts';
 import { bindMediaEvents, type MediaEventType } from './media-events.ts';
@@ -41,6 +42,8 @@ export class ReelController {
   private readonly complete: CompleteCaptions;
   private readonly loop: FrameLoop;
   private readonly playReq: PlayRequest;
+  /** Steps playback over a small hole in the buffer (see gap-skip.ts). */
+  readonly gap: GapSkip;
   private waitOn = false;
   /** The Words lamp: the dot window shows the live sentence (on, the start state) or the quiet resting line (off). The caption track itself is not shown on the picture either way. */
   private lamp = true;
@@ -71,6 +74,7 @@ export class ReelController {
       onSwitched: () => this.announce('language'),
       liveCues: () => this.captions.currentCues(),
       onConflict: () => this.captions.rewatch(),
+      chosenTrack: () => this.captions.chosen(),
     });
     this.wait = new WaitGuard({
       media,
@@ -81,6 +85,7 @@ export class ReelController {
       onHold: () => this.emit(),
     });
     this.bindEvents();
+    this.gap = new GapSkip(media, this.clock, this.abort.signal, (to) => this.wait.stopBefore(to));
     this.captions = new CaptionTracks(media, this.clock, options.guard ?? createCueGuard(media), liveCaptionHandlers(this.source, this.complete, {
       words: () => { this.emit(); },
       loading: (loading) => { this.waiting = loading; this.emit(); },

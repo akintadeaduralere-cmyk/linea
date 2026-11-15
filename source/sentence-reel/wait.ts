@@ -93,6 +93,18 @@ export class WaitGuard {
     }
   }
 
+  /**
+   * The playhead is about to be moved on to `to` for the viewer (over a hole in the buffer, see gap-skip.ts). If the sentence being
+   * played ends before that place, stop at its end now instead, as check() would have, had the film reached it. True when it stopped.
+   */
+  stopBefore(to: number): boolean {
+    if (!this.deps.enabled() || this.deps.media.paused) return false;
+    const stop = this.stopSentence();
+    if (!stop || stop.end - WAIT_END_TOLERANCE > to) return false;
+    this.stop(stop);
+    return true;
+  }
+
   destroy(): void {
     this.clearTimer();
     this.restoreSound();

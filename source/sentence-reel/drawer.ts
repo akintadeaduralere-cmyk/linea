@@ -1,4 +1,5 @@
 import type { ReelController } from './controller.ts';
+import { captionTracks } from './cues.ts';
 import { el, uid } from './dom.ts';
 import { captionOptions, ladder, nearestRate, PLAYBACK_RATES, rateText, renditionsOf, selectedRendition, selectRendition, stepRate } from './media-bindings.ts';
 import { Outputs } from './outputs.ts';
@@ -143,7 +144,7 @@ export function buildDrawer(o: DrawerOptions): Drawer {
       if (pick === 'off') { controller.setWords(false); } else {
         chosenTrack = Number(pick);
         controller.setWords(true);
-        const tracks = Array.from((media.textTracks ?? []) as Iterable<TextTrack>).filter((t) => t.kind === 'captions' || t.kind === 'subtitles');
+        const tracks = captionTracks(media); // the same order as the tiles (captions first), so a tile switches on its own track
         tracks.forEach((t, i) => { if (i === chosenTrack) t.mode = 'showing'; else if (t.mode === 'showing') t.mode = 'hidden'; });
       }
       refreshWords();

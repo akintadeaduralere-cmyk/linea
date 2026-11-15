@@ -17,7 +17,7 @@ export function liveCaptionHandlers(
     onSettled: () => complete.gate(() => source.settled()),
     onComplete: (done) => complete.gate(() => source.setComplete(done)),
     onGiveUp: () => complete.gate(() => source.giveUp()),
-    onTrackChosen: (track) => complete.choose(track),
+    onTrackChosen: (track, followLive) => complete.choose(track, followLive),
     onWords: ui.words,
     onLoading: (loading) => {
       if (loading) complete.gate(() => source.beginLoad());

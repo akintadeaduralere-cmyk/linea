@@ -1,3 +1,4 @@
+import { NOTCH_CAP } from './constants.ts';
 import { uid } from './dom.ts';
 import type { ReelState } from './types.ts';
 
@@ -12,6 +13,8 @@ const TITLE_MAX = 40;
 const DEFAULT_CAP_RATIO = 0.688;
 const SKIN_NAME = 'Linea';
 const GENERIC = 'Turn to seek · one notch · one sentence';
+/** With more lines than the reel draws notches (NOTCH_CAP) a notch holds several lines: the line then says only what is true of every notch. */
+const GENERIC_SHARED = 'Turn to seek · each notch starts a sentence';
 
 export interface DiscText {
   root: SVGSVGElement;
@@ -120,6 +123,8 @@ export function buildDiscText(host: HTMLElement, signal: AbortSignal, title: str
     const n = s.totalKnown && s.count > 0 ? s.count : lineCount;
     const lines = n > 0 ? `${n} ${n === 1 ? 'line' : 'lines'} · one notch each`.toUpperCase() : '';
     if (countLine.along.textContent !== lines) countLine.along.textContent = lines;
+    const seek = (n > NOTCH_CAP ? GENERIC_SHARED : GENERIC).toUpperCase();
+    if (generic.along.textContent !== seek) generic.along.textContent = seek;
     if (line === last) return;
     last = line;
     candidates = [line, count, shown].filter((c, i, all) => c && all.indexOf(c) === i);

@@ -108,6 +108,25 @@ export const PLAY_RETRY_MS = 8000;
 export const LOADING_ANNOUNCE_MS = 1000;
 export const PLAY_GIVE_UP_MS = 8000;
 
+/**
+ * Stepping over a small hole in the buffer (gap-skip.ts). While the film plays it is looked at every GAP_POLL_MS. If the playhead has
+ * stood still for GAP_STILL_MS at the end of its own buffered range (within GAP_EDGE_SECONDS of it, or in no range) and another range
+ * begins no more than GAP_MAX_AHEAD_SECONDS ahead, the playhead is put GAP_MARGIN_SECONDS inside that range. A skip that does not take
+ * is tried GAP_MAX_TRIES times from the same place (within GAP_SAME_PLACE_SECONDS), then left alone.
+ * Measured 15 Nov 2026 on the 6 s segment stream: holes of 0.07 s (Chromium, Chrome) and 0.29 s (WebKit), never closing by themselves.
+ * In plain playback, also on a slow and on a rebuffering connection, the playhead never stood still beside such a hole (sampled every
+ * 50 ms, both engines), so the wait only has to cover two looks. A margin of 0, 0.01 and 0.05 s all resumed playback; 0.01 is used.
+ */
+export const GAP_POLL_MS = 200;
+export const GAP_STILL_MS = 400;
+export const GAP_MAX_AHEAD_SECONDS = 0.5;
+export const GAP_EDGE_SECONDS = 0.25;
+export const GAP_MARGIN_SECONDS = 0.01;
+export const GAP_MAX_TRIES = 3;
+export const GAP_SAME_PLACE_SECONDS = 0.02;
+/** A hole the film has run over is acted on only if it could hide a frame: under this it is a rounding seam between two ranges (one frame at 60 a second is 0.0167 s). */
+export const GAP_MIN_HOLE_SECONDS = 0.015;
+
 /** HTMLMediaElement.readyState: at least the frame at the playhead is available, so it can play. */
 export const HAVE_CURRENT_DATA = 2;
 

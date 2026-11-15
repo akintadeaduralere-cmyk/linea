@@ -16,8 +16,8 @@ export interface CaptionHandlers {
   onComplete(complete: boolean): void;
   /** No usable cues arrived in time. */
   onGiveUp(reason: GiveUpReason): void;
-  /** The viewer picked another caption track (a menu set it showing). */
-  onTrackChosen(track: { language: string; label: string }): void;
+  /** The viewer picked another caption track (a menu set it showing). `followLive` makes this class read that track's own cues from the start, with the usual wait for them. */
+  onTrackChosen(track: { language: string; label: string }, followLive: () => void): void;
   /** Words (captions showing on the film) changed from outside this class. */
   onWords(on: boolean): void;
   /** True while waiting for the first cues. */
@@ -84,6 +84,12 @@ export class CaptionTracks {
     return (primary && readCues(primary)) || [];
   }
 
+  /** The track the viewer picked, while the media still has it (null when the reel follows the first track). */
+  chosen(): { language: string; label: string } | null {
+    const t = this.selected;
+    return t && captionTracks(this.media).includes(t) ? { language: t.language, label: t.label } : null;
+  }
+
   /** Watch the tracks again from now (the source changed). */
   rewatch(): void {
     this.abandoned = false;
@@ -92,7 +98,8 @@ export class CaptionTracks {
 
   /** The up-front load failed: if the track has no cues either, go to time mode now rather than after the wait. */
   abandon(): void {
-    this.abandoned = true;
+    // A track the viewer has just picked is still loading its cues: it keeps the usual wait.
+    if (!(this.loading && this.selected !== null && this.selected === this.primary())) this.abandoned = true;
     this.tick();
   }
 
@@ -164,12 +171,15 @@ export class CaptionTracks {
   }
 
   private onChange(): void {
-    if (this.loading || this.holdOpen) return;
-    const chosen = captionTracks(this.media).find((t) => t.mode === 'showing');
-    if (chosen && chosen !== this.primary()) {
+    // While the followed track is loading or held open this class keeps it showing itself, so only another showing track is a choice.
+    const busy = this.loading || this.holdOpen;
+    const chosen = captionTracks(this.media).find((t) => t.mode === 'showing' && !(busy && t === this.primary()));
+    const picked = chosen !== undefined && chosen !== this.primary();
+    if (picked) {
       this.selected = chosen;
-      this.handlers.onTrackChosen({ language: chosen.language, label: chosen.label });
+      this.handlers.onTrackChosen({ language: chosen.language, label: chosen.label }, () => this.rewatch());
     }
+    if (busy && !picked) return;
     const primary = this.primary();
     if (!primary) return;
     const on = primary.mode === 'showing';
